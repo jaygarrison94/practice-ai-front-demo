@@ -1,0 +1,218 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/app_strings.dart';
+import '../../../core/constants/app_dimensions.dart';
+import '../../../core/utils/validators.dart';
+import '../../../core/widgets/app_button.dart';
+import '../../../bloc/bookkeeping/bookkeeping_bloc.dart';
+import '../../../bloc/bookkeeping/bookkeeping_event.dart';
+import '../../../bloc/bookkeeping/bookkeeping_state.dart';
+
+class RecordFormPage extends StatefulWidget {
+  final int? recordId;
+
+  const RecordFormPage({super.key, this.recordId});
+
+  @override
+  State<RecordFormPage> createState() => _RecordFormPageState();
+}
+
+class _RecordFormPageState extends State<RecordFormPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _amountController = TextEditingController();
+  final _noteController = TextEditingController();
+
+  int _type = 1;
+  String _category = '其他';
+  DateTime _recordDate = DateTime.now();
+
+  final _expenseCategories = ['餐饮', '交通', '购物', '房租', '其他'];
+  final _incomeCategories = ['工资', '兼职', '理财', '其他'];
+
+  bool get _isEditing => widget.recordId != null;
+
+  List<String> get _categories =>
+      _type == 1 ? _expenseCategories : _incomeCategories;
+
+  @override
+  void dispose() {
+    _amountController.dispose();
+    _noteController.dispose();
+    super.dispose();
+  }
+
+  void _onSave() {
+    if (_formKey.currentState?.validate() != true) return;
+
+    final amount = double.parse(_amountController.text);
+    final dateStr = DateFormat('yyyy-MM-dd').format(_recordDate);
+
+    if (_isEditing) {
+      context.read<BookkeepingBloc>().add(UpdateRecord(
+            id: widget.recordId!,
+            type: _type,
+            amount: amount,
+            categoryName: _category,
+            note: _noteController.text,
+            recordDate: dateStr,
+          ));
+    } else {
+      context.read<BookkeepingBloc>().add(CreateRecord(
+            type: _type,
+            amount: amount,
+            categoryName: _category,
+            note: _noteController.text,
+            recordDate: dateStr,
+          ));
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(_isEditing ? '编辑成功' : '记账成功')),
+    );
+    Navigator.pop(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_isEditing ? AppStrings.editRecord : AppStrings.addRecord),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(AppDimensions.md),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: _TypeToggle(
+                      label: AppStrings.expense,
+                      isSelected: _type == 1,
+                      color: AppColors.expense,
+                      onTap: () => setState(() => _type = 1),
+                    ),
+                  ),
+                  const SizedBox(width: AppDimensions.sm),
+                  Expanded(
+                    child: _TypeToggle(
+                      label: AppStrings.income,
+                      isSelected: _type == 2,
+                      color: AppColors.income,
+                      onTap: () => setState(() => _type = 2),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppDimensions.lg),
+              TextFormField(
+                controller: _amountController,
+                decoration: const InputDecoration(
+                  labelText: AppStrings.amount,
+                  prefixText: '¥ ',
+                  hintText: '0.00',
+                ),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                validator: Validators.validateAmount,
+              ),
+              const SizedBox(height: AppDimensions.md),
+              const Text(
+                AppStrings.category,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: AppDimensions.sm),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: _categories.map((c) {
+                  return ChoiceChip(
+                    label: Text(c),
+                    selected: _category == c,
+                    onSelected: (s) {
+                      if (s) setState(() => _category = c);
+                    },
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: AppDimensions.md),
+              TextFormField(
+                controller: _noteController,
+                decoration: const InputDecoration(
+                  labelText: AppStrings.bookkeepingNote,
+                  hintText: '可选',
+                ),
+                maxLines: 2,
+              ),
+              const SizedBox(height: AppDimensions.md),
+              ListTile(
+                leading: const Icon(Icons.calendar_today),
+                title: const Text(AppStrings.recordDate),
+                trailing: Text(DateFormat('yyyy-MM-dd').format(_recordDate)),
+                onTap: () async {
+                  final date = await showDatePicker(
+                    context: context,
+                    initialDate: _recordDate,
+                    firstDate: DateTime(2020),
+                    lastDate: DateTime.now(),
+                  );
+                  if (date != null) setState(() => _recordDate = date);
+                },
+              ),
+              const SizedBox(height: AppDimensions.xl),
+              AppButton(
+                text: _isEditing ? '保存修改' : AppStrings.addRecord,
+                onPressed: _onSave,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TypeToggle extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _TypeToggle({
+    required this.label,
+    required this.isSelected,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 48,
+        decoration: BoxDecoration(
+          color: isSelected ? color : Colors.grey[200],
+          borderRadius: BorderRadius.circular(AppDimensions.buttonRadius),
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: isSelected ? Colors.white : Colors.grey[600],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
