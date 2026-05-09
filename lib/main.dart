@@ -3,9 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'core/constants/app_strings.dart';
-import 'core/storage/local_storage.dart';
 import 'core/network/api_client.dart';
 import 'core/theme/app_theme.dart';
 import 'core/notification/notification_service.dart';
@@ -42,10 +42,6 @@ void main() async {
 
 Future<void> _initDependencies() async {
   final getIt = GetIt.instance;
-
-  final localStorage = LocalStorage();
-  await localStorage.init();
-  getIt.registerSingleton(localStorage);
 
   final secureStorage = const FlutterSecureStorage();
   getIt.registerSingleton(secureStorage);
@@ -179,6 +175,12 @@ class MyApp extends StatelessWidget {
         localizationsDelegates: const [
           DefaultMaterialLocalizations.delegate,
           DefaultWidgetsLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('zh', 'CN'),
+          Locale('en', 'US'),
         ],
       ),
     );

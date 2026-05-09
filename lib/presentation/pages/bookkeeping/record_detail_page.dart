@@ -10,12 +10,22 @@ import '../../../core/widgets/message_bloc_listener.dart';
 import '../../bloc/bookkeeping/bookkeeping_bloc.dart';
 import '../../bloc/bookkeeping/bookkeeping_event.dart';
 import '../../bloc/bookkeeping/bookkeeping_state.dart';
-import '../../../data/models/bookkeeping/record.dart';
 
-class RecordDetailPage extends StatelessWidget {
+class RecordDetailPage extends StatefulWidget {
   final int recordId;
 
   const RecordDetailPage({super.key, required this.recordId});
+
+  @override
+  State<RecordDetailPage> createState() => _RecordDetailPageState();
+}
+
+class _RecordDetailPageState extends State<RecordDetailPage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<BookkeepingBloc>().add(LoadRecordDetail(widget.recordId));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,9 +36,11 @@ class RecordDetailPage extends StatelessWidget {
           actions: [
             IconButton(
               icon: const Icon(Icons.edit),
-              onPressed: () => context.push(
-                '/bookkeeping/edit/${recordId}',
-              ),
+              onPressed: () {
+                WidgetsBinding.instance.addPostFrameCallback((_) => context.push(
+                  '/bookkeeping/edit/${widget.recordId}',
+                ));
+              },
             ),
           ],
         ),
@@ -37,7 +49,7 @@ class RecordDetailPage extends StatelessWidget {
             if (state.isLoading) {
               return const Center(child: CircularProgressIndicator());
             }
-            final record = state.records.where((r) => r.id == recordId).firstOrNull;
+            final record = state.selectedRecord ?? state.records.where((r) => r.id == widget.recordId).firstOrNull;
             if (record == null) {
               return const Center(child: Text('记录不存在'));
             }
@@ -90,7 +102,7 @@ class RecordDetailPage extends StatelessWidget {
                       if (confirmed == true && context.mounted) {
                         context
                             .read<BookkeepingBloc>()
-                            .add(DeleteRecord(recordId));
+                            .add(DeleteRecord(widget.recordId));
                         Navigator.pop(context);
                       }
                     },

@@ -13,6 +13,7 @@ class BookkeepingBloc extends Bloc<BookkeepingEvent, BookkeepingState> {
     on<UpdateRecord>(_onUpdateRecord);
     on<DeleteRecord>(_onDeleteRecord);
     on<LoadStatistics>(_onLoadStatistics);
+    on<LoadRecordDetail>(_onLoadRecordDetail);
   }
 
   Future<void> _onLoadRecords(
@@ -105,6 +106,17 @@ class BookkeepingBloc extends Bloc<BookkeepingEvent, BookkeepingState> {
       emit(state.copyWith(statistics: statistics, isLoading: false));
     } catch (e) {
       emit(state.copyWith(isLoading: false, error: '加载统计数据失败'));
+    }
+  }
+
+  Future<void> _onLoadRecordDetail(
+      LoadRecordDetail event, Emitter<BookkeepingState> emit) async {
+    emit(state.copyWith(isLoading: true, error: null));
+    try {
+      final record = await _repository.getRecord(event.id);
+      emit(state.copyWith(selectedRecord: record, isLoading: false));
+    } catch (e) {
+      emit(state.copyWith(isLoading: false, error: '加载记录详情失败'));
     }
   }
 }

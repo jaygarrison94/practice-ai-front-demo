@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/utils/validators.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/message_bloc_listener.dart';
+import '../../../data/models/schedule/schedule.dart';
 import '../../bloc/schedule/schedule_bloc.dart';
 import '../../bloc/schedule/schedule_event.dart';
 import '../../bloc/schedule/schedule_state.dart';
@@ -66,23 +66,32 @@ class _ScheduleFormPageState extends State<ScheduleFormPage> {
   void initState() {
     super.initState();
     if (_isEditing) {
-      final state = context.read<ScheduleBloc>().state;
-      final schedule = state.selectedSchedule;
-      if (schedule != null) {
-        _titleController.text = schedule.title;
-        _noteController.text = schedule.note ?? '';
-        _selectedDate = DateTime.parse(schedule.scheduleDate);
-        _selectedTime = TimeOfDay(
-          hour: int.parse(schedule.scheduleTime.split(':')[0]),
-          minute: int.parse(schedule.scheduleTime.split(':')[1]),
-        );
-        _category = schedule.category ?? '其他';
-        if (schedule.repeatRule != null) {
-          _isRepeating = schedule.repeatRule!.repeatType != 'NONE';
-          _repeatType = schedule.repeatRule!.repeatType;
+      context.read<ScheduleBloc>().add(LoadScheduleDetail(widget.scheduleId!));
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final state = context.read<ScheduleBloc>().state;
+        final schedule = state.selectedSchedule;
+        if (schedule != null && schedule.id == widget.scheduleId) {
+          _populateForm(schedule);
         }
-      }
+      });
     }
+  }
+
+  void _populateForm(Schedule schedule) {
+    setState(() {
+      _titleController.text = schedule.title;
+      _noteController.text = schedule.note ?? '';
+      _selectedDate = DateTime.parse(schedule.scheduleDate);
+      _selectedTime = TimeOfDay(
+        hour: int.parse(schedule.scheduleTime.split(':')[0]),
+        minute: int.parse(schedule.scheduleTime.split(':')[1]),
+      );
+      _category = schedule.category ?? '其他';
+      if (schedule.repeatRule != null) {
+        _isRepeating = schedule.repeatRule!.repeatType != 'NONE';
+        _repeatType = schedule.repeatRule!.repeatType;
+      }
+    });
   }
 
   @override

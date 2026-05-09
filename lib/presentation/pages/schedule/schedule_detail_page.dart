@@ -4,26 +4,31 @@ import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/app_dimensions.dart';
-import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/confirm_dialog.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/message_bloc_listener.dart';
 import '../../bloc/schedule/schedule_bloc.dart';
 import '../../bloc/schedule/schedule_event.dart';
 import '../../bloc/schedule/schedule_state.dart';
-import '../../../data/models/schedule/schedule.dart';
 
-class ScheduleDetailPage extends StatelessWidget {
+class ScheduleDetailPage extends StatefulWidget {
   final int scheduleId;
 
   const ScheduleDetailPage({super.key, required this.scheduleId});
 
   @override
-  Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ScheduleBloc>().add(LoadScheduleDetail(scheduleId));
-    });
+  State<ScheduleDetailPage> createState() => _ScheduleDetailPageState();
+}
 
+class _ScheduleDetailPageState extends State<ScheduleDetailPage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<ScheduleBloc>().add(LoadScheduleDetail(widget.scheduleId));
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return MessageBlocListener<ScheduleBloc, ScheduleState>(
       child: Scaffold(
         appBar: AppBar(
@@ -31,9 +36,11 @@ class ScheduleDetailPage extends StatelessWidget {
           actions: [
             IconButton(
               icon: const Icon(Icons.edit),
-              onPressed: () => context.push(
-                '/schedule/edit/${scheduleId}',
-              ),
+              onPressed: () {
+                WidgetsBinding.instance.addPostFrameCallback((_) => context.push(
+                  '/schedule/edit/${widget.scheduleId}',
+                ));
+              },
             ),
           ],
         ),
@@ -115,7 +122,7 @@ class ScheduleDetailPage extends StatelessWidget {
                       if (confirmed == true && context.mounted) {
                         context
                             .read<ScheduleBloc>()
-                            .add(DeleteSchedule(scheduleId));
+                            .add(DeleteSchedule(widget.scheduleId));
                         Navigator.pop(context);
                       }
                     },

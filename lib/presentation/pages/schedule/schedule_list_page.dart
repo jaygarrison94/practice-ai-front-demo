@@ -100,7 +100,9 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
           ],
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () => context.push('/schedule/create'),
+          onPressed: () {
+            WidgetsBinding.instance.addPostFrameCallback((_) => context.push('/schedule/create'));
+          },
           child: const Icon(Icons.add),
         ),
         body: Column(
@@ -210,9 +212,11 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
                             visualDensity: VisualDensity.compact,
                           )
                         : null,
-                    onTap: () => context.push(
-                      '/schedule/${schedule.id}',
-                    ),
+                    onTap: () {
+                      WidgetsBinding.instance.addPostFrameCallback((_) => context.push(
+                        '/schedule/${schedule.id}',
+                      ));
+                    },
                   ),
                 ),
               );

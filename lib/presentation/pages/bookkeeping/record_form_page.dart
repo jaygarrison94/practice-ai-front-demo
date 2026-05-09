@@ -47,7 +47,7 @@ class _RecordFormPageState extends State<RecordFormPage> {
   void _onSave() {
     if (_formKey.currentState?.validate() != true) return;
 
-    final amount = double.parse(_amountController.text);
+    final amount = double.tryParse(_amountController.text) ?? 0;
     final dateStr = DateFormat('yyyy-MM-dd').format(_recordDate);
 
     if (_isEditing) {

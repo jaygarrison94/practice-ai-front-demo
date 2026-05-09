@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/app_dimensions.dart';
-import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/message_bloc_listener.dart';
 import '../../bloc/bookkeeping/bookkeeping_bloc.dart';
@@ -36,12 +35,16 @@ class _RecordListPageState extends State<RecordListPage> {
           actions: [
             IconButton(
               icon: const Icon(Icons.bar_chart),
-              onPressed: () => context.push('/bookkeeping/statistics'),
+              onPressed: () {
+                WidgetsBinding.instance.addPostFrameCallback((_) => context.push('/bookkeeping/statistics'));
+              },
             ),
           ],
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () => context.push('/bookkeeping/create'),
+          onPressed: () {
+            WidgetsBinding.instance.addPostFrameCallback((_) => context.push('/bookkeeping/create'));
+          },
           child: const Icon(Icons.add),
         ),
         body: Column(
@@ -144,9 +147,11 @@ class _RecordListPageState extends State<RecordListPage> {
                         color: record.isIncome ? AppColors.income : AppColors.expense,
                       ),
                     ),
-                    onTap: () => context.push(
-                      '/bookkeeping/${record.id}',
-                    ),
+                    onTap: () {
+                      WidgetsBinding.instance.addPostFrameCallback((_) => context.push(
+                        '/bookkeeping/${record.id}',
+                      ));
+                    },
                   ),
                 ),
               );

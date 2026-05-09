@@ -1,6 +1,4 @@
 import 'package:equatable/equatable.dart';
-import '../../../data/models/bookkeeping/record.dart';
-import '../../../data/models/bookkeeping/statistics.dart';
 
 abstract class BookkeepingEvent extends Equatable {
   const BookkeepingEvent();
@@ -80,4 +78,12 @@ class LoadStatistics extends BookkeepingEvent {
 
   @override
   List<Object?> get props => [startDate, endDate];
+}
+
+class LoadRecordDetail extends BookkeepingEvent {
+  final int id;
+  const LoadRecordDetail(this.id);
+
+  @override
+  List<Object?> get props => [id];
 }

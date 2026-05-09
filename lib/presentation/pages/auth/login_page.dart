@@ -94,10 +94,12 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const Text(AppStrings.rememberPassword),
                     const Spacer(),
-                    TextButton(
-                      onPressed: () => context.push('/forgot-password'),
-                      child: const Text(AppStrings.forgotPassword),
-                    ),
+                  TextButton(
+                    onPressed: () {
+                      WidgetsBinding.instance.addPostFrameCallback((_) => context.go('/register'));
+                    },
+                    child: const Text(AppStrings.noAccount),
+                  ),
                   ],
                 ),
                 const SizedBox(height: AppDimensions.lg),

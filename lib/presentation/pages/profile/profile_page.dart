@@ -10,8 +10,19 @@ import '../../bloc/auth/auth_bloc.dart';
 import '../../bloc/auth/auth_event.dart';
 import '../../bloc/auth/auth_state.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<AuthBloc>().add(const LoadProfile());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +75,9 @@ class ProfilePage extends StatelessWidget {
                         const Spacer(),
                         IconButton(
                           icon: const Icon(Icons.edit),
-                          onPressed: () => context.push('/profile/edit'),
+                          onPressed: () {
+                            WidgetsBinding.instance.addPostFrameCallback((_) => context.push('/profile/edit'));
+                          },
                         ),
                       ],
                     ),
@@ -138,3 +151,4 @@ class ProfilePage extends StatelessWidget {
     );
   }
 }
+

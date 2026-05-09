@@ -21,16 +21,18 @@ class MainShell extends StatelessWidget {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
         onTap: (index) {
-          switch (index) {
-            case 0:
-              context.go('/home');
-            case 1:
-              context.go('/schedule');
-            case 2:
-              context.go('/bookkeeping');
-            case 3:
-              context.go('/profile');
-          }
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            switch (index) {
+              case 0:
+                context.go('/home');
+              case 1:
+                context.go('/schedule');
+              case 2:
+                context.go('/bookkeeping');
+              case 3:
+                context.go('/profile');
+            }
+          });
         },
         type: BottomNavigationBarType.fixed,
         selectedItemColor: AppColors.primary,

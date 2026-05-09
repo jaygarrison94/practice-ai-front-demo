@@ -118,7 +118,9 @@ class HomePage extends StatelessWidget {
             icon: Icons.calendar_today,
             label: '新建日程',
             color: AppColors.primary,
-            onTap: () => context.push('/schedule/create'),
+            onTap: () {
+              WidgetsBinding.instance.addPostFrameCallback((_) => context.push('/schedule/create'));
+            },
           ),
         ),
         const SizedBox(width: AppDimensions.md),
@@ -127,7 +129,9 @@ class HomePage extends StatelessWidget {
             icon: Icons.receipt_long,
             label: '记一笔',
             color: AppColors.income,
-            onTap: () => context.push('/bookkeeping/create'),
+            onTap: () {
+              WidgetsBinding.instance.addPostFrameCallback((_) => context.push('/bookkeeping/create'));
+            },
           ),
         ),
       ],
@@ -158,7 +162,9 @@ class HomePage extends StatelessWidget {
                       ),
                     ),
                     TextButton(
-                      onPressed: () => context.push('/schedule'),
+                      onPressed: () {
+                        WidgetsBinding.instance.addPostFrameCallback((_) => context.push('/schedule'));
+                      },
                       child: const Text('查看全部'),
                     ),
                   ],
@@ -224,7 +230,9 @@ class HomePage extends StatelessWidget {
                       ),
                     ),
                     TextButton(
-                      onPressed: () => context.push('/bookkeeping'),
+                      onPressed: () {
+                        WidgetsBinding.instance.addPostFrameCallback((_) => context.push('/bookkeeping'));
+                      },
                       child: const Text('查看全部'),
                     ),
                   ],

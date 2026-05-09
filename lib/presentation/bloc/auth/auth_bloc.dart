@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
@@ -19,13 +20,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<LogoutRequested>(_onLogout);
     on<CheckAuthStatus>(_onCheckAuthStatus);
     on<UpdateProfile>(_onUpdateProfile);
+    on<ResetPassword>(_onResetPassword);
+    on<LoadProfile>(_onLoadProfile);
   }
 
   Future<void> _onSendSmsCode(
       SendSmsCode event, Emitter<AuthState> emit) async {
-    emit(state.copyWith(error: null));
+    emit(state.copyWith(error: null, successMessage: null));
     try {
       await _userRepository.sendSmsCode(event.phone);
+      emit(state.copyWith(successMessage: '验证码已发送'));
     } catch (e) {
       emit(state.copyWith(error: '验证码发送失败，请稍后再试'));
     }
@@ -119,6 +123,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   Future<void> _onUpdateProfile(
       UpdateProfile event, Emitter<AuthState> emit) async {
+    emit(state.copyWith(error: null, successMessage: null));
     try {
       await _userRepository.updateProfile(
         nickname: event.nickname,
@@ -136,7 +141,52 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
+  Future<void> _onResetPassword(
+      ResetPassword event, Emitter<AuthState> emit) async {
+    emit(state.copyWith(status: AuthStatus.loading, error: null, successMessage: null));
+    try {
+      await _userRepository.resetPassword(
+        phone: event.phone,
+        smsCode: event.smsCode,
+        newPassword: event.newPassword,
+        confirmPassword: event.confirmPassword,
+      );
+      emit(state.copyWith(
+        status: AuthStatus.unauthenticated,
+        successMessage: '密码重置成功，请重新登录',
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        status: AuthStatus.unauthenticated,
+        error: _parseError(e),
+      ));
+    }
+  }
+
+  Future<void> _onLoadProfile(
+      LoadProfile event, Emitter<AuthState> emit) async {
+    try {
+      final profile = await _userRepository.getProfile();
+      emit(state.copyWith(profile: profile));
+    } catch (e) {
+      emit(state.copyWith(error: '加载用户信息失败'));
+    }
+  }
+
   String _parseError(dynamic e) {
+    if (e is DioException) {
+      final responseData = e.response?.data;
+      if (responseData is Map) {
+        return (responseData['message'] as String?) ?? '操作失败';
+      }
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout) {
+        return '网络连接超时';
+      }
+      if (e.type == DioExceptionType.connectionError) {
+        return '网络连接失败，请检查网络设置';
+      }
+    }
     return '操作失败，请稍后再试';
   }
 }

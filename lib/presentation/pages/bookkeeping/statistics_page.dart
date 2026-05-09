@@ -7,6 +7,7 @@ import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/message_bloc_listener.dart';
+import '../../../data/models/bookkeeping/statistics.dart';
 import '../../bloc/bookkeeping/bookkeeping_bloc.dart';
 import '../../bloc/bookkeeping/bookkeeping_event.dart';
 import '../../bloc/bookkeeping/bookkeeping_state.dart';
@@ -105,7 +106,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
     );
   }
 
-  Widget _buildSummaryCard(stats) {
+  Widget _buildSummaryCard(StatisticsResult stats) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(AppDimensions.lg),
@@ -152,10 +153,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
     );
   }
 
-  Widget _buildChart(stats) {
-    final incomeStats = stats.categoryStats
-        .where((s) => s.type == 2)
-        .toList();
+  Widget _buildChart(StatisticsResult stats) {
     final expenseStats = stats.categoryStats
         .where((s) => s.type == 1)
         .toList();

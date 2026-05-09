@@ -65,3 +65,24 @@ class UpdateProfile extends AuthEvent {
   @override
   List<Object?> get props => [nickname, avatar, gender, birthday];
 }
+
+class ResetPassword extends AuthEvent {
+  final String phone;
+  final String smsCode;
+  final String newPassword;
+  final String confirmPassword;
+
+  const ResetPassword({
+    required this.phone,
+    required this.smsCode,
+    required this.newPassword,
+    required this.confirmPassword,
+  });
+
+  @override
+  List<Object?> get props => [phone, smsCode, newPassword, confirmPassword];
+}
+
+class LoadProfile extends AuthEvent {
+  const LoadProfile();
+}

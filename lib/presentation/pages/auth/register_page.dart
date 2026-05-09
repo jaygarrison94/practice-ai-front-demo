@@ -167,10 +167,12 @@ class _RegisterPageState extends State<RegisterPage> {
                       onChanged: (v) => setState(() => _agreementAccepted = v ?? false),
                     ),
                     const Text(AppStrings.agreementPrefix),
-                    TextButton(
-                      onPressed: () {},
-                      child: const Text(AppStrings.userAgreement),
-                    ),
+                  TextButton(
+                    onPressed: () {
+                      WidgetsBinding.instance.addPostFrameCallback((_) => context.go('/login'));
+                    },
+                    child: const Text(AppStrings.hasAccount),
+                  ),
                     const Text(AppStrings.and),
                     TextButton(
                       onPressed: () {},
