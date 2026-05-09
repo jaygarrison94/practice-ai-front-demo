@@ -167,12 +167,10 @@ class _RegisterPageState extends State<RegisterPage> {
                       onChanged: (v) => setState(() => _agreementAccepted = v ?? false),
                     ),
                     const Text(AppStrings.agreementPrefix),
-                  TextButton(
-                    onPressed: () {
-                      WidgetsBinding.instance.addPostFrameCallback((_) => context.go('/login'));
-                    },
-                    child: const Text(AppStrings.hasAccount),
-                  ),
+                    TextButton(
+                      onPressed: () => context.pop(),
+                      child: const Text(AppStrings.hasAccount),
+                    ),
                     const Text(AppStrings.and),
                     TextButton(
                       onPressed: () {},
@@ -193,7 +191,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 const SizedBox(height: AppDimensions.md),
                 Center(
                   child: TextButton(
-                    onPressed: () => context.go('/login'),
+                    onPressed: () => context.pop(),
                     child: const Text(AppStrings.hasAccount),
                   ),
                 ),

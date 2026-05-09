@@ -31,8 +31,8 @@ class AuthState extends Equatable implements MessageState {
       status: status ?? this.status,
       user: user ?? this.user,
       profile: profile ?? this.profile,
-      error: error,
-      successMessage: successMessage,
+      error: error ?? this.error,
+      successMessage: successMessage ?? this.successMessage,
     );
   }
 

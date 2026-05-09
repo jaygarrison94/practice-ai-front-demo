@@ -94,12 +94,10 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const Text(AppStrings.rememberPassword),
                     const Spacer(),
-                  TextButton(
-                    onPressed: () {
-                      WidgetsBinding.instance.addPostFrameCallback((_) => context.go('/register'));
-                    },
-                    child: const Text(AppStrings.noAccount),
-                  ),
+                    TextButton(
+                      onPressed: () => context.push('/register'),
+                      child: const Text(AppStrings.noAccount),
+                    ),
                   ],
                 ),
                 const SizedBox(height: AppDimensions.lg),
@@ -115,7 +113,7 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: AppDimensions.md),
                 Center(
                   child: TextButton(
-                    onPressed: () => context.go('/register'),
+                    onPressed: () => context.push('/register'),
                     child: const Text(AppStrings.noAccount),
                   ),
                 ),

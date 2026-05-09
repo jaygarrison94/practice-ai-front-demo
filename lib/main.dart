@@ -37,7 +37,7 @@ import 'presentation/pages/profile/edit_profile_page.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await _initDependencies();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 Future<void> _initDependencies() async {
@@ -62,34 +62,63 @@ Future<void> _initDependencies() async {
   getIt.registerSingleton(BookkeepingRepository(apiClient));
 }
 
-class MyApp extends StatelessWidget {
-  MyApp({super.key});
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late final AuthBloc _authBloc;
+  late final GoRouter _router;
+
+  @override
+  void initState() {
+    super.initState();
     final getIt = GetIt.instance;
 
-    final router = GoRouter(
+    _authBloc = AuthBloc(
+      getIt<UserRepository>(),
+      getIt<AuthLocalDataSource>(),
+    )..add(CheckAuthStatus());
+
+    _router = GoRouter(
       initialLocation: '/splash',
       routes: [
         GoRoute(
           path: '/splash',
-          builder: (context, state) => const SplashPage(),
+          builder: (context, state) => BlocProvider.value(
+            value: _authBloc,
+            child: const SplashPage(),
+          ),
         ),
         GoRoute(
           path: '/login',
-          builder: (context, state) => const LoginPage(),
+          builder: (context, state) => BlocProvider.value(
+            value: _authBloc,
+            child: const LoginPage(),
+          ),
         ),
         GoRoute(
           path: '/register',
-          builder: (context, state) => const RegisterPage(),
+          builder: (context, state) => BlocProvider.value(
+            value: _authBloc,
+            child: const RegisterPage(),
+          ),
         ),
         GoRoute(
           path: '/forgot-password',
-          builder: (context, state) => const ForgotPasswordPage(),
+          builder: (context, state) => BlocProvider.value(
+            value: _authBloc,
+            child: const ForgotPasswordPage(),
+          ),
         ),
         ShellRoute(
-          builder: (context, state, child) => MainShell(child: child),
+          builder: (context, state, child) => BlocProvider.value(
+            value: _authBloc,
+            child: MainShell(child: child),
+          ),
           routes: [
             GoRoute(
               path: '/home',
@@ -111,66 +140,92 @@ class MyApp extends StatelessWidget {
         ),
         GoRoute(
           path: '/schedule/create',
-          builder: (context, state) => const ScheduleFormPage(),
+          builder: (context, state) => BlocProvider.value(
+            value: _authBloc,
+            child: const ScheduleFormPage(),
+          ),
         ),
         GoRoute(
           path: '/schedule/edit/:id',
-          builder: (context, state) => ScheduleFormPage(
-            scheduleId: int.parse(state.pathParameters['id']!),
+          builder: (context, state) => BlocProvider.value(
+            value: _authBloc,
+            child: ScheduleFormPage(
+              scheduleId: int.parse(state.pathParameters['id']!),
+            ),
           ),
         ),
         GoRoute(
           path: '/schedule/:id',
-          builder: (context, state) => ScheduleDetailPage(
-            scheduleId: int.parse(state.pathParameters['id']!),
+          builder: (context, state) => BlocProvider.value(
+            value: _authBloc,
+            child: ScheduleDetailPage(
+              scheduleId: int.parse(state.pathParameters['id']!),
+            ),
           ),
         ),
         GoRoute(
           path: '/bookkeeping/create',
-          builder: (context, state) => const RecordFormPage(),
+          builder: (context, state) => BlocProvider.value(
+            value: _authBloc,
+            child: const RecordFormPage(),
+          ),
         ),
         GoRoute(
           path: '/bookkeeping/edit/:id',
-          builder: (context, state) => RecordFormPage(
-            recordId: int.parse(state.pathParameters['id']!),
+          builder: (context, state) => BlocProvider.value(
+            value: _authBloc,
+            child: RecordFormPage(
+              recordId: int.parse(state.pathParameters['id']!),
+            ),
           ),
         ),
         GoRoute(
           path: '/bookkeeping/:id',
-          builder: (context, state) => RecordDetailPage(
-            recordId: int.parse(state.pathParameters['id']!),
+          builder: (context, state) => BlocProvider.value(
+            value: _authBloc,
+            child: RecordDetailPage(
+              recordId: int.parse(state.pathParameters['id']!),
+            ),
           ),
         ),
         GoRoute(
           path: '/bookkeeping/statistics',
-          builder: (context, state) => const StatisticsPage(),
+          builder: (context, state) => BlocProvider.value(
+            value: _authBloc,
+            child: const StatisticsPage(),
+          ),
         ),
         GoRoute(
           path: '/profile/edit',
-          builder: (context, state) => const EditProfilePage(),
+          builder: (context, state) => BlocProvider.value(
+            value: _authBloc,
+            child: const EditProfilePage(),
+          ),
         ),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    _authBloc.close();
+    _router.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final getIt = GetIt.instance;
 
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (_) => AuthBloc(
-            getIt<UserRepository>(),
-            getIt<AuthLocalDataSource>(),
-          )..add(CheckAuthStatus()),
-        ),
-        BlocProvider(
-          create: (_) => ScheduleBloc(getIt<ScheduleRepository>()),
-        ),
-        BlocProvider(
-          create: (_) => BookkeepingBloc(getIt<BookkeepingRepository>()),
-        ),
+        BlocProvider(create: (_) => ScheduleBloc(getIt<ScheduleRepository>())),
+        BlocProvider(create: (_) => BookkeepingBloc(getIt<BookkeepingRepository>())),
       ],
       child: MaterialApp.router(
         title: AppStrings.appName,
         theme: AppTheme.lightTheme,
-        routerConfig: router,
+        routerConfig: _router,
         debugShowCheckedModeBanner: false,
         localizationsDelegates: const [
           DefaultMaterialLocalizations.delegate,
