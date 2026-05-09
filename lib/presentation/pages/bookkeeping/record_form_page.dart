@@ -6,9 +6,10 @@ import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/utils/validators.dart';
 import '../../../core/widgets/app_button.dart';
-import '../../../bloc/bookkeeping/bookkeeping_bloc.dart';
-import '../../../bloc/bookkeeping/bookkeeping_event.dart';
-import '../../../bloc/bookkeeping/bookkeeping_state.dart';
+import '../../../core/widgets/message_bloc_listener.dart';
+import '../../bloc/bookkeeping/bookkeeping_bloc.dart';
+import '../../bloc/bookkeeping/bookkeeping_event.dart';
+import '../../bloc/bookkeeping/bookkeeping_state.dart';
 
 class RecordFormPage extends StatefulWidget {
   final int? recordId;
@@ -67,111 +68,109 @@ class _RecordFormPageState extends State<RecordFormPage> {
             recordDate: dateStr,
           ));
     }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(_isEditing ? '编辑成功' : '记账成功')),
-    );
-    Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEditing ? AppStrings.editRecord : AppStrings.addRecord),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppDimensions.md),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: _TypeToggle(
-                      label: AppStrings.expense,
-                      isSelected: _type == 1,
-                      color: AppColors.expense,
-                      onTap: () => setState(() => _type = 1),
+    return MessageBlocListener<BookkeepingBloc, BookkeepingState>(
+      popOnSuccess: true,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(_isEditing ? AppStrings.editRecord : AppStrings.addRecord),
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppDimensions.md),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: _TypeToggle(
+                        label: AppStrings.expense,
+                        isSelected: _type == 1,
+                        color: AppColors.expense,
+                        onTap: () => setState(() => _type = 1),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: AppDimensions.sm),
-                  Expanded(
-                    child: _TypeToggle(
-                      label: AppStrings.income,
-                      isSelected: _type == 2,
-                      color: AppColors.income,
-                      onTap: () => setState(() => _type = 2),
+                    const SizedBox(width: AppDimensions.sm),
+                    Expanded(
+                      child: _TypeToggle(
+                        label: AppStrings.income,
+                        isSelected: _type == 2,
+                        color: AppColors.income,
+                        onTap: () => setState(() => _type = 2),
+                      ),
                     ),
+                  ],
+                ),
+                const SizedBox(height: AppDimensions.lg),
+                TextFormField(
+                  controller: _amountController,
+                  decoration: const InputDecoration(
+                    labelText: AppStrings.amount,
+                    prefixText: '¥ ',
+                    hintText: '0.00',
                   ),
-                ],
-              ),
-              const SizedBox(height: AppDimensions.lg),
-              TextFormField(
-                controller: _amountController,
-                decoration: const InputDecoration(
-                  labelText: AppStrings.amount,
-                  prefixText: '¥ ',
-                  hintText: '0.00',
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
+                  validator: Validators.validateAmount,
                 ),
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
-                validator: Validators.validateAmount,
-              ),
-              const SizedBox(height: AppDimensions.md),
-              const Text(
-                AppStrings.category,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
+                const SizedBox(height: AppDimensions.md),
+                const Text(
+                  AppStrings.category,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-              const SizedBox(height: AppDimensions.sm),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: _categories.map((c) {
-                  return ChoiceChip(
-                    label: Text(c),
-                    selected: _category == c,
-                    onSelected: (s) {
-                      if (s) setState(() => _category = c);
-                    },
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: AppDimensions.md),
-              TextFormField(
-                controller: _noteController,
-                decoration: const InputDecoration(
-                  labelText: AppStrings.bookkeepingNote,
-                  hintText: '可选',
+                const SizedBox(height: AppDimensions.sm),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: _categories.map((c) {
+                    return ChoiceChip(
+                      label: Text(c),
+                      selected: _category == c,
+                      onSelected: (s) {
+                        if (s) setState(() => _category = c);
+                      },
+                    );
+                  }).toList(),
                 ),
-                maxLines: 2,
-              ),
-              const SizedBox(height: AppDimensions.md),
-              ListTile(
-                leading: const Icon(Icons.calendar_today),
-                title: const Text(AppStrings.recordDate),
-                trailing: Text(DateFormat('yyyy-MM-dd').format(_recordDate)),
-                onTap: () async {
-                  final date = await showDatePicker(
-                    context: context,
-                    initialDate: _recordDate,
-                    firstDate: DateTime(2020),
-                    lastDate: DateTime.now(),
-                  );
-                  if (date != null) setState(() => _recordDate = date);
-                },
-              ),
-              const SizedBox(height: AppDimensions.xl),
-              AppButton(
-                text: _isEditing ? '保存修改' : AppStrings.addRecord,
-                onPressed: _onSave,
-              ),
-            ],
+                const SizedBox(height: AppDimensions.md),
+                TextFormField(
+                  controller: _noteController,
+                  decoration: const InputDecoration(
+                    labelText: AppStrings.bookkeepingNote,
+                    hintText: '可选',
+                  ),
+                  maxLines: 2,
+                ),
+                const SizedBox(height: AppDimensions.md),
+                ListTile(
+                  leading: const Icon(Icons.calendar_today),
+                  title: const Text(AppStrings.recordDate),
+                  trailing: Text(DateFormat('yyyy-MM-dd').format(_recordDate)),
+                  onTap: () async {
+                    final date = await showDatePicker(
+                      context: context,
+                      initialDate: _recordDate,
+                      firstDate: DateTime(2020),
+                      lastDate: DateTime.now(),
+                    );
+                    if (date != null) setState(() => _recordDate = date);
+                  },
+                ),
+                const SizedBox(height: AppDimensions.xl),
+                AppButton(
+                  text: _isEditing ? '保存修改' : AppStrings.addRecord,
+                  onPressed: _onSave,
+                ),
+              ],
+            ),
           ),
         ),
       ),

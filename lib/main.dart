@@ -37,7 +37,7 @@ import 'presentation/pages/profile/edit_profile_page.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await _initDependencies();
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 Future<void> _initDependencies() async {

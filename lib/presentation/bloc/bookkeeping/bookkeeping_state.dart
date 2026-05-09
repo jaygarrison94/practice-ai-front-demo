@@ -1,8 +1,9 @@
 import 'package:equatable/equatable.dart';
+import '../../../core/widgets/message_bloc_listener.dart';
 import '../../../data/models/bookkeeping/record.dart';
 import '../../../data/models/bookkeeping/statistics.dart';
 
-class BookkeepingState extends Equatable {
+class BookkeepingState extends Equatable implements MessageState {
   final List<Record> records;
   final Record? selectedRecord;
   final StatisticsResult? statistics;

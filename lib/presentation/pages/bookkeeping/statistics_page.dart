@@ -6,9 +6,10 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/utils/formatters.dart';
-import '../../../bloc/bookkeeping/bookkeeping_bloc.dart';
-import '../../../bloc/bookkeeping/bookkeeping_event.dart';
-import '../../../bloc/bookkeeping/bookkeeping_state.dart';
+import '../../../core/widgets/message_bloc_listener.dart';
+import '../../bloc/bookkeeping/bookkeeping_bloc.dart';
+import '../../bloc/bookkeeping/bookkeeping_event.dart';
+import '../../bloc/bookkeeping/bookkeeping_state.dart';
 
 class StatisticsPage extends StatefulWidget {
   const StatisticsPage({super.key});
@@ -49,55 +50,57 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text(AppStrings.statistics)),
-      body: Column(
-        children: [
-          Container(
-            height: 44,
-            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.md),
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: _periods.length,
-              separatorBuilder: (_, __) => const SizedBox(width: AppDimensions.sm),
-              itemBuilder: (context, index) {
-                final period = _periods[index];
-                final isSelected = _selectedPeriod == period;
-                return ChoiceChip(
-                  label: Text(period),
-                  selected: isSelected,
-                  onSelected: (_) {
-                    setState(() => _selectedPeriod = period);
-                    _loadStatistics();
-                  },
-                );
-              },
+    return MessageBlocListener<BookkeepingBloc, BookkeepingState>(
+      child: Scaffold(
+        appBar: AppBar(title: const Text(AppStrings.statistics)),
+        body: Column(
+          children: [
+            Container(
+              height: 44,
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.md),
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: _periods.length,
+                separatorBuilder: (_, __) => const SizedBox(width: AppDimensions.sm),
+                itemBuilder: (context, index) {
+                  final period = _periods[index];
+                  final isSelected = _selectedPeriod == period;
+                  return ChoiceChip(
+                    label: Text(period),
+                    selected: isSelected,
+                    onSelected: (_) {
+                      setState(() => _selectedPeriod = period);
+                      _loadStatistics();
+                    },
+                  );
+                },
+              ),
             ),
-          ),
-          Expanded(
-            child: BlocBuilder<BookkeepingBloc, BookkeepingState>(
-              builder: (context, state) {
-                if (state.isLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                final stats = state.statistics;
-                if (stats == null) {
-                  return const Center(child: Text('暂无统计数据'));
-                }
-                return SingleChildScrollView(
-                  padding: const EdgeInsets.all(AppDimensions.md),
-                  child: Column(
-                    children: [
-                      _buildSummaryCard(stats),
-                      const SizedBox(height: AppDimensions.lg),
-                      _buildChart(stats),
-                    ],
-                  ),
-                );
-              },
+            Expanded(
+              child: BlocBuilder<BookkeepingBloc, BookkeepingState>(
+                builder: (context, state) {
+                  if (state.isLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  final stats = state.statistics;
+                  if (stats == null) {
+                    return const Center(child: Text('暂无统计数据'));
+                  }
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.all(AppDimensions.md),
+                    child: Column(
+                      children: [
+                        _buildSummaryCard(stats),
+                        const SizedBox(height: AppDimensions.lg),
+                        _buildChart(stats),
+                      ],
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -177,7 +180,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                     value: s.percentage,
                     title: '${s.percentage.toStringAsFixed(1)}%',
                     color: AppColors.primary
-                        .withAlpha((255 - expenseStats.indexOf(s) * 40).clamp(80, 255)),
+                        .withAlpha((255 - expenseStats.indexOf(s) * 40).clamp(80, 255).toInt()),
                     radius: 60,
                     titleStyle: const TextStyle(
                       fontSize: 10,

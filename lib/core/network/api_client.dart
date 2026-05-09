@@ -33,18 +33,20 @@ class ApiClient {
   Future<ApiResponse<T>> post<T>(
     String path, {
     dynamic data,
+    Map<String, dynamic>? queryParameters,
     T Function(dynamic)? fromJson,
   }) async {
-    final response = await _dio.post(path, data: data);
+    final response = await _dio.post(path, data: data, queryParameters: queryParameters);
     return ApiResponse.fromJson(response.data, fromJson);
   }
 
   Future<ApiResponse<T>> put<T>(
     String path, {
     dynamic data,
+    Map<String, dynamic>? queryParameters,
     T Function(dynamic)? fromJson,
   }) async {
-    final response = await _dio.put(path, data: data);
+    final response = await _dio.put(path, data: data, queryParameters: queryParameters);
     return ApiResponse.fromJson(response.data, fromJson);
   }
 

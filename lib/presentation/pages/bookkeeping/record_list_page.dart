@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/empty_state.dart';
-import '../../../bloc/bookkeeping/bookkeeping_bloc.dart';
-import '../../../bloc/bookkeeping/bookkeeping_event.dart';
-import '../../../bloc/bookkeeping/bookkeeping_state.dart';
+import '../../../core/widgets/message_bloc_listener.dart';
+import '../../bloc/bookkeeping/bookkeeping_bloc.dart';
+import '../../bloc/bookkeeping/bookkeeping_event.dart';
+import '../../bloc/bookkeeping/bookkeeping_state.dart';
 
 class RecordListPage extends StatefulWidget {
   const RecordListPage({super.key});
@@ -27,25 +29,27 @@ class _RecordListPageState extends State<RecordListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.bookkeeping),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.bar_chart),
-            onPressed: () => Navigator.pushNamed(context, '/bookkeeping/statistics'),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pushNamed(context, '/bookkeeping/create'),
-        child: const Icon(Icons.add),
-      ),
-      body: Column(
-        children: [
-          _buildTypeSelector(),
-          Expanded(child: _buildRecordList()),
-        ],
+    return MessageBlocListener<BookkeepingBloc, BookkeepingState>(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(AppStrings.bookkeeping),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.bar_chart),
+              onPressed: () => context.push('/bookkeeping/statistics'),
+            ),
+          ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => context.push('/bookkeeping/create'),
+          child: const Icon(Icons.add),
+        ),
+        body: Column(
+          children: [
+            _buildTypeSelector(),
+            Expanded(child: _buildRecordList()),
+          ],
+        ),
       ),
     );
   }
@@ -140,8 +144,7 @@ class _RecordListPageState extends State<RecordListPage> {
                         color: record.isIncome ? AppColors.income : AppColors.expense,
                       ),
                     ),
-                    onTap: () => Navigator.pushNamed(
-                      context,
+                    onTap: () => context.push(
                       '/bookkeeping/${record.id}',
                     ),
                   ),

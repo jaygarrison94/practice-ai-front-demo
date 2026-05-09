@@ -8,8 +8,10 @@ import '../../../core/constants/app_dimensions.dart';
 import '../../../core/utils/validators.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
-import '../../../bloc/auth/auth_bloc.dart';
-import '../../../bloc/auth/auth_event.dart';
+import '../../../core/widgets/message_bloc_listener.dart';
+import '../../bloc/auth/auth_bloc.dart';
+import '../../bloc/auth/auth_event.dart';
+import '../../bloc/auth/auth_state.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -68,81 +70,79 @@ class _EditProfilePageState extends State<EditProfilePage> {
           gender: _gender,
           birthday: _birthday?.toIso8601String(),
         ));
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('保存成功')),
-    );
-    Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text(AppStrings.editProfile)),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppDimensions.md),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              const SizedBox(height: AppDimensions.lg),
-              GestureDetector(
-                onTap: _pickImage,
-                child: CircleAvatar(
-                  radius: 48,
-                  backgroundColor: AppColors.primaryLight,
-                  backgroundImage: _avatarPath != null
-                      ? FileImage(File(_avatarPath!))
-                      : null,
-                  child: _avatarPath == null
-                      ? const Icon(Icons.camera_alt, size: 32, color: Colors.white)
-                      : null,
+    return MessageBlocListener<AuthBloc, AuthState>(
+      popOnSuccess: true,
+      child: Scaffold(
+        appBar: AppBar(title: const Text(AppStrings.editProfile)),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppDimensions.md),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                const SizedBox(height: AppDimensions.lg),
+                GestureDetector(
+                  onTap: _pickImage,
+                  child: CircleAvatar(
+                    radius: 48,
+                    backgroundColor: AppColors.primaryLight,
+                    backgroundImage: _avatarPath != null
+                        ? FileImage(File(_avatarPath!))
+                        : null,
+                    child: _avatarPath == null
+                        ? const Icon(Icons.camera_alt, size: 32, color: Colors.white)
+                        : null,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4),
-              TextButton(
-                onPressed: _pickImage,
-                child: const Text('点击更换头像'),
-              ),
-              const SizedBox(height: AppDimensions.lg),
-              AppTextField(
-                controller: _nicknameController,
-                labelText: AppStrings.nickname,
-                hintText: '请输入昵称',
-                maxLength: 10,
-                validator: Validators.validateNickname,
-              ),
-              const SizedBox(height: AppDimensions.md),
-              DropdownButtonFormField<String>(
-                value: _gender,
-                decoration: const InputDecoration(labelText: AppStrings.gender),
-                items: _genders
-                    .map((g) => DropdownMenuItem(value: g, child: Text(g)))
-                    .toList(),
-                onChanged: (v) => setState(() => _gender = v ?? '未设置'),
-              ),
-              const SizedBox(height: AppDimensions.md),
-              ListTile(
-                leading: const Icon(Icons.cake),
-                title: const Text(AppStrings.birthday),
-                trailing: Text(
-                  _birthday != null
-                      ? '${_birthday!.year}-${_birthday!.month}-${_birthday!.day}'
-                      : '未设置',
+                const SizedBox(height: 4),
+                TextButton(
+                  onPressed: _pickImage,
+                  child: const Text('点击更换头像'),
                 ),
-                onTap: () async {
-                  final date = await showDatePicker(
-                    context: context,
-                    initialDate: _birthday ?? DateTime(2000),
-                    firstDate: DateTime(1950),
-                    lastDate: DateTime.now(),
-                  );
-                  if (date != null) setState(() => _birthday = date);
-                },
-              ),
-              const SizedBox(height: AppDimensions.xl),
-              AppButton(text: AppStrings.save, onPressed: _onSave),
-            ],
+                const SizedBox(height: AppDimensions.lg),
+                AppTextField(
+                  controller: _nicknameController,
+                  labelText: AppStrings.nickname,
+                  hintText: '请输入昵称',
+                  maxLength: 10,
+                  validator: Validators.validateNickname,
+                ),
+                const SizedBox(height: AppDimensions.md),
+                DropdownButtonFormField<String>(
+                  value: _gender,
+                  decoration: const InputDecoration(labelText: AppStrings.gender),
+                  items: _genders
+                      .map((g) => DropdownMenuItem(value: g, child: Text(g)))
+                      .toList(),
+                  onChanged: (v) => setState(() => _gender = v ?? '未设置'),
+                ),
+                const SizedBox(height: AppDimensions.md),
+                ListTile(
+                  leading: const Icon(Icons.cake),
+                  title: const Text(AppStrings.birthday),
+                  trailing: Text(
+                    _birthday != null
+                        ? '${_birthday!.year}-${_birthday!.month}-${_birthday!.day}'
+                        : '未设置',
+                  ),
+                  onTap: () async {
+                    final date = await showDatePicker(
+                      context: context,
+                      initialDate: _birthday ?? DateTime(2000),
+                      firstDate: DateTime(1950),
+                      lastDate: DateTime.now(),
+                    );
+                    if (date != null) setState(() => _birthday = date);
+                  },
+                ),
+                const SizedBox(height: AppDimensions.xl),
+                AppButton(text: AppStrings.save, onPressed: _onSave),
+              ],
+            ),
           ),
         ),
       ),

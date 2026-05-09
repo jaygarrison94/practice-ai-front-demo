@@ -1,7 +1,8 @@
 import 'package:equatable/equatable.dart';
+import '../../../core/widgets/message_bloc_listener.dart';
 import '../../../data/models/schedule/schedule.dart';
 
-class ScheduleState extends Equatable {
+class ScheduleState extends Equatable implements MessageState {
   final List<Schedule> schedules;
   final Schedule? selectedSchedule;
   final bool isLoading;

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_strings.dart';
-import '../../core/constants/app_dimensions.dart';
-import '../../core/utils/formatters.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/app_strings.dart';
+import '../../../core/constants/app_dimensions.dart';
+import '../../../core/utils/formatters.dart';
+import '../../../core/widgets/message_bloc_listener.dart';
 import '../../bloc/auth/auth_bloc.dart';
 import '../../bloc/auth/auth_state.dart';
 import '../../bloc/schedule/schedule_bloc.dart';
@@ -18,36 +20,42 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    context.read<ScheduleBloc>().add(const LoadSchedules());
-    context.read<BookkeepingBloc>().add(const LoadRecords());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ScheduleBloc>().add(const LoadSchedules());
+      context.read<BookkeepingBloc>().add(const LoadRecords());
+    });
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.appName),
-        actions: [
-          BlocBuilder<AuthBloc, AuthState>(
-            builder: (context, state) {
-              return IconButton(
-                icon: const Icon(Icons.notifications_outlined),
-                onPressed: () {},
-              );
-            },
+    return MessageBlocListener<ScheduleBloc, ScheduleState>(
+      child: MessageBlocListener<BookkeepingBloc, BookkeepingState>(
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text(AppStrings.appName),
+            actions: [
+              BlocBuilder<AuthBloc, AuthState>(
+                builder: (context, state) {
+                  return IconButton(
+                    icon: const Icon(Icons.notifications_outlined),
+                    onPressed: () {},
+                  );
+                },
+              ),
+            ],
           ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppDimensions.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildWelcomeSection(context),
-            const SizedBox(height: AppDimensions.lg),
-            _buildQuickActions(context),
-            const SizedBox(height: AppDimensions.lg),
-            _buildTodaySchedule(context),
-            const SizedBox(height: AppDimensions.lg),
-            _buildTodayBookkeeping(context),
-          ],
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(AppDimensions.md),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildWelcomeSection(context),
+                const SizedBox(height: AppDimensions.lg),
+                _buildQuickActions(context),
+                const SizedBox(height: AppDimensions.lg),
+                _buildTodaySchedule(context),
+                const SizedBox(height: AppDimensions.lg),
+                _buildTodayBookkeeping(context),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -110,7 +118,7 @@ class HomePage extends StatelessWidget {
             icon: Icons.calendar_today,
             label: '新建日程',
             color: AppColors.primary,
-            onTap: () => Navigator.pushNamed(context, '/schedule/create'),
+            onTap: () => context.push('/schedule/create'),
           ),
         ),
         const SizedBox(width: AppDimensions.md),
@@ -119,7 +127,7 @@ class HomePage extends StatelessWidget {
             icon: Icons.receipt_long,
             label: '记一笔',
             color: AppColors.income,
-            onTap: () => Navigator.pushNamed(context, '/bookkeeping/create'),
+            onTap: () => context.push('/bookkeeping/create'),
           ),
         ),
       ],
@@ -150,8 +158,7 @@ class HomePage extends StatelessWidget {
                       ),
                     ),
                     TextButton(
-                      onPressed: () =>
-                          Navigator.pushNamed(context, '/schedule'),
+                      onPressed: () => context.push('/schedule'),
                       child: const Text('查看全部'),
                     ),
                   ],
@@ -217,8 +224,7 @@ class HomePage extends StatelessWidget {
                       ),
                     ),
                     TextButton(
-                      onPressed: () =>
-                          Navigator.pushNamed(context, '/bookkeeping'),
+                      onPressed: () => context.push('/bookkeeping'),
                       child: const Text('查看全部'),
                     ),
                   ],

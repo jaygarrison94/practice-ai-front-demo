@@ -1,10 +1,11 @@
 import 'package:equatable/equatable.dart';
+import '../../../core/widgets/message_bloc_listener.dart';
 import '../../../data/models/user/user.dart';
 import '../../../data/models/user/user_profile.dart';
 
 enum AuthStatus { initial, authenticated, unauthenticated, loading }
 
-class AuthState extends Equatable {
+class AuthState extends Equatable implements MessageState {
   final AuthStatus status;
   final User? user;
   final UserProfile? profile;

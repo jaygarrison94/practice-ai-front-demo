@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_strings.dart';
+import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/app_strings.dart';
+import '../../../core/widgets/message_bloc_listener.dart';
 import '../../bloc/auth/auth_bloc.dart';
 import '../../bloc/auth/auth_state.dart';
 
@@ -34,36 +35,38 @@ class _SplashPageState extends State<SplashPage> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.auto_awesome,
-              size: 80,
-              color: AppColors.primary,
-            ),
-            SizedBox(height: 16),
-            Text(
-              AppStrings.appName,
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+    return MessageBlocListener<AuthBloc, AuthState>(
+      child: const Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.auto_awesome,
+                size: 80,
+                color: AppColors.primary,
               ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              '您的智能生活助手',
-              style: TextStyle(
-                fontSize: 14,
-                color: AppColors.textSecondary,
+              SizedBox(height: 16),
+              Text(
+                AppStrings.appName,
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
               ),
-            ),
-            SizedBox(height: 32),
-            CircularProgressIndicator(),
-          ],
+              SizedBox(height: 8),
+              Text(
+                '您的智能生活助手',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              SizedBox(height: 32),
+              CircularProgressIndicator(),
+            ],
+          ),
         ),
       ),
     );

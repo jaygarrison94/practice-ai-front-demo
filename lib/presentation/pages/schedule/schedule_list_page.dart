@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/empty_state.dart';
-import '../../../bloc/schedule/schedule_bloc.dart';
-import '../../../bloc/schedule/schedule_event.dart';
-import '../../../bloc/schedule/schedule_state.dart';
+import '../../../core/widgets/message_bloc_listener.dart';
+import '../../bloc/schedule/schedule_bloc.dart';
+import '../../bloc/schedule/schedule_event.dart';
+import '../../bloc/schedule/schedule_state.dart';
 
 class ScheduleListPage extends StatefulWidget {
   const ScheduleListPage({super.key});
@@ -68,44 +70,46 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: _isSearching
-            ? TextField(
-                controller: _searchController,
-                autofocus: true,
-                decoration: const InputDecoration(
-                  hintText: '搜索日程...',
-                  border: InputBorder.none,
-                ),
-                onChanged: _onSearch,
-              )
-            : const Text(AppStrings.schedule),
-        actions: [
-          IconButton(
-            icon: Icon(_isSearching ? Icons.close : Icons.search),
-            onPressed: () {
-              setState(() {
-                _isSearching = !_isSearching;
-                if (!_isSearching) {
-                  _searchController.clear();
-                  context.read<ScheduleBloc>().add(const LoadSchedules());
-                }
-              });
-            },
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pushNamed(context, '/schedule/create'),
-        child: const Icon(Icons.add),
-      ),
-      body: Column(
-        children: [
-          _buildFilterBar(),
-          _buildCategoryBar(),
-          Expanded(child: _buildScheduleList()),
-        ],
+    return MessageBlocListener<ScheduleBloc, ScheduleState>(
+      child: Scaffold(
+        appBar: AppBar(
+          title: _isSearching
+              ? TextField(
+                  controller: _searchController,
+                  autofocus: true,
+                  decoration: const InputDecoration(
+                    hintText: '搜索日程...',
+                    border: InputBorder.none,
+                  ),
+                  onChanged: _onSearch,
+                )
+              : const Text(AppStrings.schedule),
+          actions: [
+            IconButton(
+              icon: Icon(_isSearching ? Icons.close : Icons.search),
+              onPressed: () {
+                setState(() {
+                  _isSearching = !_isSearching;
+                  if (!_isSearching) {
+                    _searchController.clear();
+                    context.read<ScheduleBloc>().add(const LoadSchedules());
+                  }
+                });
+              },
+            ),
+          ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => context.push('/schedule/create'),
+          child: const Icon(Icons.add),
+        ),
+        body: Column(
+          children: [
+            _buildFilterBar(),
+            _buildCategoryBar(),
+            Expanded(child: _buildScheduleList()),
+          ],
+        ),
       ),
     );
   }
@@ -206,8 +210,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
                             visualDensity: VisualDensity.compact,
                           )
                         : null,
-                    onTap: () => Navigator.pushNamed(
-                      context,
+                    onTap: () => context.push(
                       '/schedule/${schedule.id}',
                     ),
                   ),
