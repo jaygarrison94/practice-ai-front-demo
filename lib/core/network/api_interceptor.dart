@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../data/datasources/auth_local_datasource.dart';
 
 class AuthInterceptor extends Interceptor {
@@ -11,18 +10,21 @@ class AuthInterceptor extends Interceptor {
   void onRequest(
     RequestOptions options,
     RequestInterceptorHandler handler,
-  ) async {
-    final token = await _authStorage.getToken();
-    if (token != null && token.isNotEmpty) {
-      options.headers['Authorization'] = 'Bearer $token';
-    }
-    handler.next(options);
+  ) {
+    _authStorage.getToken().then((token) {
+      if (token != null && token.isNotEmpty) {
+        options.headers['Authorization'] = 'Bearer $token';
+      }
+      handler.next(options);
+    }).catchError((_) {
+      handler.next(options);
+    });
   }
 
   @override
-  void onError(DioException err, ErrorInterceptorHandler handler) async {
+  void onError(DioException err, ErrorInterceptorHandler handler) {
     if (err.response?.statusCode == 401) {
-      await _authStorage.clearAuth();
+      _authStorage.clearAuth();
     }
     handler.next(err);
   }
