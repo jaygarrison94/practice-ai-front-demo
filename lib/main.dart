@@ -15,7 +15,6 @@ import 'data/repositories/schedule_repository.dart';
 import 'data/repositories/bookkeeping_repository.dart';
 import 'presentation/bloc/auth/auth_bloc.dart';
 import 'presentation/bloc/auth/auth_event.dart';
-import 'presentation/bloc/auth/auth_state.dart';
 import 'presentation/bloc/schedule/schedule_bloc.dart';
 import 'presentation/bloc/bookkeeping/bookkeeping_bloc.dart';
 import 'presentation/pages/splash/splash_page.dart';
@@ -219,6 +218,7 @@ class _MyAppState extends State<MyApp> {
 
     return MultiBlocProvider(
       providers: [
+        BlocProvider.value(value: _authBloc),
         BlocProvider(create: (_) => ScheduleBloc(getIt<ScheduleRepository>())),
         BlocProvider(create: (_) => BookkeepingBloc(getIt<BookkeepingRepository>())),
       ],

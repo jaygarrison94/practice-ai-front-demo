@@ -7,7 +7,6 @@ import '../../../core/constants/app_dimensions.dart';
 import '../../../core/utils/validators.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
-import '../../../core/widgets/message_bloc_listener.dart';
 import '../../bloc/auth/auth_bloc.dart';
 import '../../bloc/auth/auth_event.dart';
 import '../../bloc/auth/auth_state.dart';
@@ -44,7 +43,22 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MessageBlocListener<AuthBloc, AuthState>(
+    return BlocListener<AuthBloc, AuthState>(
+      listenWhen: (previous, current) =>
+          previous.status != current.status || previous.error != current.error,
+      listener: (context, state) {
+        if (state.status == AuthStatus.authenticated) {
+          context.go('/home');
+        }
+        if (state.error != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.error!),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      },
       child: Scaffold(
         appBar: AppBar(title: const Text(AppStrings.login)),
         body: SingleChildScrollView(

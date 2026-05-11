@@ -117,6 +117,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     const SizedBox(width: AppDimensions.sm),
                     SizedBox(
+                      width: 100,
                       height: AppDimensions.buttonHeight,
                       child: ElevatedButton(
                         onPressed: _countdown > 0 ? null : _sendSmsCode,
