@@ -29,8 +29,16 @@ class _ScheduleDetailPageState extends State<ScheduleDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MessageBlocListener<ScheduleBloc, ScheduleState>(
-      child: Scaffold(
+    return BlocListener<ScheduleBloc, ScheduleState>(
+      listenWhen: (previous, current) =>
+          previous.successMessage != current.successMessage,
+      listener: (context, state) {
+        if (state.successMessage == '删除成功' && context.mounted) {
+          context.pop();
+        }
+      },
+      child: MessageBlocListener<ScheduleBloc, ScheduleState>(
+        child: Scaffold(
         appBar: AppBar(
           title: const Text('日程详情'),
           actions: [
@@ -123,7 +131,6 @@ class _ScheduleDetailPageState extends State<ScheduleDetailPage> {
                         context
                             .read<ScheduleBloc>()
                             .add(DeleteSchedule(widget.scheduleId));
-                        Navigator.pop(context);
                       }
                     },
                   ),
@@ -131,6 +138,7 @@ class _ScheduleDetailPageState extends State<ScheduleDetailPage> {
               ),
             );
           },
+        ),
         ),
       ),
     );

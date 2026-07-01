@@ -29,8 +29,16 @@ class _RecordDetailPageState extends State<RecordDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MessageBlocListener<BookkeepingBloc, BookkeepingState>(
-      child: Scaffold(
+    return BlocListener<BookkeepingBloc, BookkeepingState>(
+      listenWhen: (previous, current) =>
+          previous.successMessage != current.successMessage,
+      listener: (context, state) {
+        if (state.successMessage == '删除成功' && context.mounted) {
+          context.pop();
+        }
+      },
+      child: MessageBlocListener<BookkeepingBloc, BookkeepingState>(
+        child: Scaffold(
         appBar: AppBar(
           title: const Text('记录详情'),
           actions: [
@@ -103,7 +111,6 @@ class _RecordDetailPageState extends State<RecordDetailPage> {
                         context
                             .read<BookkeepingBloc>()
                             .add(DeleteRecord(widget.recordId));
-                        Navigator.pop(context);
                       }
                     },
                   ),
@@ -111,6 +118,7 @@ class _RecordDetailPageState extends State<RecordDetailPage> {
               ),
             );
           },
+        ),
         ),
       ),
     );

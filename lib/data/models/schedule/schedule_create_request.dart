@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'repeat_rule.dart';
 
 class ScheduleCreateRequest extends Equatable {
   final String title;

@@ -1,20 +1,24 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'core/constants/app_strings.dart';
 import 'core/network/api_client.dart';
 import 'core/theme/app_theme.dart';
 import 'core/notification/notification_service.dart';
+import 'core/widgets/crt_overlay.dart';
 import 'data/datasources/auth_local_datasource.dart';
 import 'data/repositories/user_repository.dart';
 import 'data/repositories/schedule_repository.dart';
 import 'data/repositories/bookkeeping_repository.dart';
 import 'presentation/bloc/auth/auth_bloc.dart';
 import 'presentation/bloc/auth/auth_event.dart';
+import 'presentation/bloc/auth/auth_state.dart';
 import 'presentation/bloc/schedule/schedule_bloc.dart';
 import 'presentation/bloc/bookkeeping/bookkeeping_bloc.dart';
 import 'presentation/pages/splash/splash_page.dart';
@@ -42,7 +46,7 @@ void main() async {
 Future<void> _initDependencies() async {
   final getIt = GetIt.instance;
 
-  final secureStorage = const FlutterSecureStorage();
+  const secureStorage = FlutterSecureStorage();
   getIt.registerSingleton(secureStorage);
 
   final authLocalDS = AuthLocalDataSource(secureStorage);
@@ -51,8 +55,7 @@ Future<void> _initDependencies() async {
   final apiClient = ApiClient();
   getIt.registerSingleton(apiClient);
 
-  final notificationService =
-      NotificationService(FlutterLocalNotificationsPlugin());
+  final notificationService = NotificationService();
   await notificationService.init();
   getIt.registerSingleton(notificationService);
 
@@ -72,6 +75,30 @@ class _MyAppState extends State<MyApp> {
   late final AuthBloc _authBloc;
   late final GoRouter _router;
 
+  String? _redirect(BuildContext context, GoRouterState state) {
+    final status = _authBloc.state.status;
+    final location = state.uri.toString();
+    final isAuthPage =
+        location == '/splash' ||
+        location == '/login' ||
+        location == '/register' ||
+        location == '/forgot-password';
+
+    if (status == AuthStatus.initial || status == AuthStatus.loading) {
+      return location == '/splash' ? null : '/splash';
+    }
+
+    if (status == AuthStatus.unauthenticated) {
+      return isAuthPage ? null : '/login';
+    }
+
+    if (status == AuthStatus.authenticated && isAuthPage) {
+      return '/home';
+    }
+
+    return null;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -84,6 +111,8 @@ class _MyAppState extends State<MyApp> {
 
     _router = GoRouter(
       initialLocation: '/splash',
+      refreshListenable: GoRouterRefreshStream(_authBloc.stream),
+      redirect: _redirect,
       routes: [
         GoRoute(
           path: '/splash',
@@ -237,7 +266,22 @@ class _MyAppState extends State<MyApp> {
           Locale('zh', 'CN'),
           Locale('en', 'US'),
         ],
+        builder: (context, child) => CrtOverlay(child: child!),
       ),
     );
+  }
+}
+
+class GoRouterRefreshStream extends ChangeNotifier {
+  GoRouterRefreshStream(Stream<dynamic> stream) {
+    _subscription = stream.asBroadcastStream().listen((_) => notifyListeners());
+  }
+
+  late final StreamSubscription<dynamic> _subscription;
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
   }
 }

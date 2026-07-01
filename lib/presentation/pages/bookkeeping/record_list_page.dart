@@ -35,16 +35,12 @@ class _RecordListPageState extends State<RecordListPage> {
           actions: [
             IconButton(
               icon: const Icon(Icons.bar_chart),
-              onPressed: () {
-                WidgetsBinding.instance.addPostFrameCallback((_) => context.push('/bookkeeping/statistics'));
-              },
+              onPressed: () => context.push('/bookkeeping/statistics'),
             ),
           ],
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            WidgetsBinding.instance.addPostFrameCallback((_) => context.push('/bookkeeping/create'));
-          },
+          onPressed: () => context.push('/bookkeeping/create'),
           child: const Icon(Icons.add),
         ),
         body: Column(
@@ -68,7 +64,7 @@ class _RecordListPageState extends State<RecordListPage> {
             color: AppColors.expense,
             onTap: () {
               setState(() => _selectedType = 1);
-              context.read<BookkeepingBloc>().add(LoadRecords(type: 1));
+              context.read<BookkeepingBloc>().add(const LoadRecords(type: 1));
             },
           ),
           const SizedBox(width: AppDimensions.md),
@@ -78,7 +74,7 @@ class _RecordListPageState extends State<RecordListPage> {
             color: AppColors.income,
             onTap: () {
               setState(() => _selectedType = 2);
-              context.read<BookkeepingBloc>().add(LoadRecords(type: 2));
+              context.read<BookkeepingBloc>().add(const LoadRecords(type: 2));
             },
           ),
           const SizedBox(width: AppDimensions.md),
@@ -107,7 +103,11 @@ class _RecordListPageState extends State<RecordListPage> {
         }
         return RefreshIndicator(
           onRefresh: () async {
-            context.read<BookkeepingBloc>().add(const LoadRecords());
+            context.read<BookkeepingBloc>().add(
+                  _selectedType == 0
+                      ? const LoadRecords()
+                      : LoadRecords(type: _selectedType),
+                );
           },
           child: ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: AppDimensions.md),
@@ -147,11 +147,7 @@ class _RecordListPageState extends State<RecordListPage> {
                         color: record.isIncome ? AppColors.income : AppColors.expense,
                       ),
                     ),
-                    onTap: () {
-                      WidgetsBinding.instance.addPostFrameCallback((_) => context.push(
-                        '/bookkeeping/${record.id}',
-                      ));
-                    },
+                    onTap: () => context.push('/bookkeeping/${record.id}'),
                   ),
                 ),
               );

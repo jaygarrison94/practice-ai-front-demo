@@ -5,6 +5,9 @@ import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/utils/validators.dart';
 import '../../../core/widgets/app_button.dart';
+import '../../../core/widgets/app_dropdown_field.dart';
+import '../../../core/widgets/app_picker_tile.dart';
+import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/message_bloc_listener.dart';
 import '../../../data/models/schedule/schedule.dart';
 import '../../bloc/schedule/schedule_bloc.dart';
@@ -31,7 +34,7 @@ class _ScheduleFormPageState extends State<ScheduleFormPage> {
   String _category = '其他';
   bool _isRepeating = false;
   String _repeatType = 'NONE';
-  List<int> _repeatWeekDays = [];
+  final List<int> _repeatWeekDays = [];
   int? _repeatMonthDate;
   DateTime? _repeatEndDate;
 
@@ -67,13 +70,6 @@ class _ScheduleFormPageState extends State<ScheduleFormPage> {
     super.initState();
     if (_isEditing) {
       context.read<ScheduleBloc>().add(LoadScheduleDetail(widget.scheduleId!));
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        final state = context.read<ScheduleBloc>().state;
-        final schedule = state.selectedSchedule;
-        if (schedule != null && schedule.id == widget.scheduleId) {
-          _populateForm(schedule);
-        }
-      });
     }
   }
 
@@ -86,10 +82,26 @@ class _ScheduleFormPageState extends State<ScheduleFormPage> {
         hour: int.parse(schedule.scheduleTime.split(':')[0]),
         minute: int.parse(schedule.scheduleTime.split(':')[1]),
       );
+      _remindBefore = const {
+            '5m': '5分钟',
+            '10m': '10分钟',
+            '30m': '30分钟',
+            '1h': '1小时',
+            '1d': '1天',
+          }[schedule.remindBefore] ??
+          '10分钟';
       _category = schedule.category ?? '其他';
       if (schedule.repeatRule != null) {
         _isRepeating = schedule.repeatRule!.repeatType != 'NONE';
-        _repeatType = schedule.repeatRule!.repeatType;
+        _repeatType = const {
+              'DAILY': '每日',
+              'WEEKLY': '每周',
+              'MONTHLY': '每月',
+            }[schedule.repeatRule!.repeatType] ??
+            '单次';
+      } else {
+        _isRepeating = false;
+        _repeatType = '单次';
       }
     });
   }
@@ -155,111 +167,125 @@ class _ScheduleFormPageState extends State<ScheduleFormPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MessageBlocListener<ScheduleBloc, ScheduleState>(
-      popOnSuccess: true,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(_isEditing ? AppStrings.editSchedule : AppStrings.addSchedule),
-        ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppDimensions.md),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextFormField(
-                  controller: _titleController,
-                  decoration: const InputDecoration(
+    return BlocListener<ScheduleBloc, ScheduleState>(
+      listenWhen: (previous, current) =>
+          previous.selectedSchedule != current.selectedSchedule,
+      listener: (context, state) {
+        final schedule = state.selectedSchedule;
+        if (schedule != null && schedule.id == widget.scheduleId) {
+          _populateForm(schedule);
+        }
+      },
+      child: MessageBlocListener<ScheduleBloc, ScheduleState>(
+        popOnSuccess: true,
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(
+              _isEditing ? AppStrings.editSchedule : AppStrings.addSchedule,
+            ),
+          ),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(AppDimensions.md),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AppTextField(
+                    controller: _titleController,
                     labelText: AppStrings.scheduleTitle,
                     hintText: '请输入日程标题',
+                    validator: Validators.validateScheduleTitle,
                   ),
-                  validator: Validators.validateScheduleTitle,
-                ),
-                const SizedBox(height: AppDimensions.md),
-                ListTile(
-                  leading: const Icon(Icons.calendar_today),
-                  title: const Text(AppStrings.scheduleDate),
-                  trailing: Text(DateFormat('yyyy-MM-dd').format(_selectedDate)),
+                  const SizedBox(height: AppDimensions.md),
+                AppPickerTile(
+                  icon: Icons.calendar_today,
+                  label: AppStrings.scheduleDate,
+                  value: DateFormat('yyyy-MM-dd').format(_selectedDate),
                   onTap: _pickDate,
                 ),
-                ListTile(
-                  leading: const Icon(Icons.access_time),
-                  title: const Text(AppStrings.scheduleTime),
-                  trailing: Text(_selectedTime.format(context)),
+                const SizedBox(height: AppDimensions.sm),
+                AppPickerTile(
+                  icon: Icons.access_time,
+                  label: AppStrings.scheduleTime,
+                  value: _selectedTime.format(context),
                   onTap: _pickTime,
                 ),
-                const SizedBox(height: AppDimensions.sm),
-                DropdownButtonFormField<String>(
-                  value: _remindBefore,
-                  decoration: const InputDecoration(labelText: AppStrings.remindBefore),
-                  items: _remindOptions
-                      .map((o) => DropdownMenuItem(value: o, child: Text(o)))
-                      .toList(),
-                  onChanged: (v) => setState(() => _remindBefore = v ?? '10分钟'),
-                ),
-                const SizedBox(height: AppDimensions.md),
-                DropdownButtonFormField<String>(
-                  value: _category,
-                  decoration: const InputDecoration(labelText: AppStrings.scheduleCategory),
-                  items: _categories
-                      .map((c) => DropdownMenuItem(value: c, child: Text(c)))
-                      .toList(),
-                  onChanged: (v) => setState(() => _category = v ?? '其他'),
-                ),
-                const SizedBox(height: AppDimensions.md),
-                TextFormField(
-                  controller: _noteController,
-                  decoration: const InputDecoration(
+                  const SizedBox(height: AppDimensions.sm),
+                  AppDropdownField<String>(
+                    initialValue: _remindBefore,
+                    labelText: AppStrings.remindBefore,
+                    items: _remindOptions
+                        .map((o) => DropdownMenuItem(value: o, child: Text(o)))
+                        .toList(),
+                    onChanged: (v) => setState(() => _remindBefore = v ?? '10分钟'),
+                  ),
+                  const SizedBox(height: AppDimensions.md),
+                  AppDropdownField<String>(
+                    initialValue: _category,
+                    labelText: AppStrings.scheduleCategory,
+                    items: _categories
+                        .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                        .toList(),
+                    onChanged: (v) => setState(() => _category = v ?? '其他'),
+                  ),
+                  const SizedBox(height: AppDimensions.md),
+                  AppTextField(
+                    controller: _noteController,
                     labelText: AppStrings.scheduleNote,
                     hintText: '可选',
+                    maxLines: 3,
                   ),
-                  maxLines: 3,
-                ),
-                const SizedBox(height: AppDimensions.md),
-                SwitchListTile(
-                  title: const Text(AppStrings.repeatReminder),
-                  value: _isRepeating,
-                  onChanged: (v) => setState(() => _isRepeating = v),
-                ),
-                if (_isRepeating) ...[
-                  DropdownButtonFormField<String>(
-                    value: _repeatType == 'NONE' ? '单次' : _repeatType,
-                    decoration: const InputDecoration(labelText: '重复类型'),
-                    items: _repeatTypes
-                        .map((t) => DropdownMenuItem(value: t, child: Text(t)))
-                        .toList(),
-                    onChanged: (v) => setState(() => _repeatType = v ?? '单次'),
+                  const SizedBox(height: AppDimensions.md),
+                  SwitchListTile(
+                    title: const Text(AppStrings.repeatReminder),
+                    value: _isRepeating,
+                    onChanged: (v) => setState(() => _isRepeating = v),
                   ),
-                  if (_repeatType == '每周') ...[
-                    const SizedBox(height: AppDimensions.sm),
-                    Wrap(
-                      spacing: 8,
-                      children: List.generate(7, (i) {
-                        final days = ['一', '二', '三', '四', '五', '六', '日'];
-                        return FilterChip(
-                          label: Text(days[i]),
-                          selected: _repeatWeekDays.contains(i + 1),
-                          onSelected: (s) {
-                            setState(() {
-                              if (s) {
-                                _repeatWeekDays.add(i + 1);
-                              } else {
-                                _repeatWeekDays.remove(i + 1);
-                              }
-                            });
-                          },
-                        );
-                      }),
+                  if (_isRepeating) ...[
+                    AppDropdownField<String>(
+                      initialValue: _repeatType == 'NONE' ? '单次' : _repeatType,
+                      labelText: '重复类型',
+                      items: _repeatTypes
+                          .map((t) => DropdownMenuItem(value: t, child: Text(t)))
+                          .toList(),
+                      onChanged: (v) => setState(() => _repeatType = v ?? '单次'),
                     ),
+                    if (_repeatType == '每周') ...[
+                      const SizedBox(height: AppDimensions.sm),
+                      Wrap(
+                        spacing: 8,
+                        children: List.generate(7, (i) {
+                          final days = ['一', '二', '三', '四', '五', '六', '日'];
+                          return FilterChip(
+                            label: Text(days[i]),
+                            selected: _repeatWeekDays.contains(i + 1),
+                            onSelected: (s) {
+                              setState(() {
+                                if (s) {
+                                  _repeatWeekDays.add(i + 1);
+                                } else {
+                                  _repeatWeekDays.remove(i + 1);
+                                }
+                              });
+                            },
+                          );
+                        }),
+                      ),
+                    ],
                   ],
+                  const SizedBox(height: AppDimensions.xl),
+                  BlocBuilder<ScheduleBloc, ScheduleState>(
+                    builder: (context, state) {
+                      return AppButton(
+                        text: _isEditing ? '保存修改' : AppStrings.addSchedule,
+                        isLoading: state.isLoading,
+                        onPressed: _onSave,
+                      );
+                    },
+                  ),
                 ],
-                const SizedBox(height: AppDimensions.xl),
-                AppButton(
-                  text: _isEditing ? '保存修改' : AppStrings.addSchedule,
-                  onPressed: _onSave,
-                ),
-              ],
+              ),
             ),
           ),
         ),

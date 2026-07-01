@@ -3,22 +3,28 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
-  static const Color primary = Color(0xFF4A90D9);
-  static const Color primaryLight = Color(0xFF7AB3E8);
-  static const Color primaryDark = Color(0xFF2C6AA8);
+  // EVA Unit-01 inspired palette
+  static const Color primary = Color(0xFF6A0DAD);
+  static const Color primaryDark = Color(0xFF3A0050);
+  static const Color accent = Color(0xFF00FF41);
 
-  static const Color income = Color(0xFF4CAF50);
-  static const Color expense = Color(0xFFE53935);
+  static const Color income = Color(0xFF00FF41);
+  static const Color expense = Color(0xFFFF4500);
 
-  static const Color textPrimary = Color(0xFF333333);
-  static const Color textSecondary = Color(0xFF666666);
-  static const Color textHint = Color(0xFF999999);
+  static const Color surface = Color(0xFF1A1A2E);
+  static const Color surfaceDark = Color(0xFF0D0D1A);
 
-  static const Color background = Color(0xFFF5F5F5);
-  static const Color cardBackground = Colors.white;
-  static const Color divider = Color(0xFFEEEEEE);
+  static const Color background = Color(0xFF0A0A0A);
+  static const Color backgroundLight = Color(0xFF1A1A2E);
 
-  static const Color error = Color(0xFFE53935);
-  static const Color success = Color(0xFF4CAF50);
-  static const Color warning = Color(0xFFFFA726);
+  static const Color textPrimary = Color(0xFFFFFFFF);
+  static const Color textSecondary = Color(0xFF888888);
+  static const Color textDark = Color(0xFF0A0A0A);
+
+  static const Color borderLight = Color(0xFF00FF41);
+  static const Color borderDark = Color(0xFF3A0050);
+
+  static const Color error = Color(0xFFFF0000);
+  static const Color success = Color(0xFF00FF41);
+  static const Color warning = Color(0xFFFF4500);
 }

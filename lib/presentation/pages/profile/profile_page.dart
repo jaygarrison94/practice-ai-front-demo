@@ -45,7 +45,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       children: [
                         CircleAvatar(
                           radius: 36,
-                          backgroundColor: AppColors.primaryLight,
+                          backgroundColor: AppColors.primary,
                           child: Text(
                             nickname.isNotEmpty ? nickname[0] : '用',
                             style: const TextStyle(
@@ -67,7 +67,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                             ),
                             Text(
-                              phone.isNotEmpty ? '$phone' : '',
+                              phone.isNotEmpty ? phone : '',
                               style: const TextStyle(color: AppColors.textSecondary),
                             ),
                           ],
@@ -75,9 +75,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         const Spacer(),
                         IconButton(
                           icon: const Icon(Icons.edit),
-                          onPressed: () {
-                            WidgetsBinding.instance.addPostFrameCallback((_) => context.push('/profile/edit'));
-                          },
+                          onPressed: () => context.push('/profile/edit'),
                         ),
                       ],
                     ),
@@ -151,4 +149,3 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 }
-

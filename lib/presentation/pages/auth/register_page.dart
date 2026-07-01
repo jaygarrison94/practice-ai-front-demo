@@ -43,7 +43,6 @@ class _RegisterPageState extends State<RegisterPage> {
     final phone = _phoneController.text;
     if (Validators.validatePhone(phone) != null) return;
     context.read<AuthBloc>().add(SendSmsCode(phone));
-    _startCountdown();
   }
 
   void _startCountdown() {
@@ -59,9 +58,15 @@ class _RegisterPageState extends State<RegisterPage> {
   void _onRegister() {
     if (_formKey.currentState?.validate() != true) return;
     if (!_agreementAccepted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请勾选用户协议与隐私政策')),
-      );
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text('请勾选用户协议与隐私政策'),
+            duration: Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
       return;
     }
     context.read<AuthBloc>().add(RegisterSubmitted(
@@ -75,128 +80,140 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MessageBlocListener<AuthBloc, AuthState>(
-      child: Scaffold(
-        appBar: AppBar(title: const Text(AppStrings.register)),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppDimensions.lg),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: AppDimensions.xxl),
-                const Text(
-                  '创建账号',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  '注册您的私人管家账号',
-                  style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
-                ),
-                const SizedBox(height: AppDimensions.xl),
-                AppTextField(
-                  controller: _phoneController,
-                  hintText: AppStrings.phoneHint,
-                  keyboardType: TextInputType.phone,
-                  maxLength: 11,
-                  validator: Validators.validatePhone,
-                ),
-                const SizedBox(height: AppDimensions.md),
-                Row(
-                  children: [
-                    Expanded(
-                      child: AppTextField(
-                        controller: _smsCodeController,
-                        hintText: AppStrings.smsCodeHint,
-                        keyboardType: TextInputType.number,
-                        maxLength: 6,
-                        validator: Validators.validateSmsCode,
-                      ),
-                    ),
-                    const SizedBox(width: AppDimensions.sm),
-                    SizedBox(
-                      width: 100,
-                      height: AppDimensions.buttonHeight,
-                      child: ElevatedButton(
-                        onPressed: _countdown > 0 ? null : _sendSmsCode,
-                        child: Text(
-                          _countdown > 0
-                              ? '${_countdown}s'
-                              : AppStrings.getSmsCode,
+    return BlocListener<AuthBloc, AuthState>(
+      listenWhen: (previous, current) =>
+          previous.successMessage != current.successMessage,
+      listener: (context, state) {
+        if (state.successMessage == '验证码已发送' && _countdown == 0) {
+          _startCountdown();
+        }
+      },
+      child: MessageBlocListener<AuthBloc, AuthState>(
+        child: Scaffold(
+          appBar: AppBar(title: const Text(AppStrings.register)),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(AppDimensions.lg),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: AppDimensions.xxl),
+                  const Text(
+                    '创建账号',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    '注册您的私人管家账号',
+                    style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+                  ),
+                  const SizedBox(height: AppDimensions.xl),
+                  AppTextField(
+                    controller: _phoneController,
+                    hintText: AppStrings.phoneHint,
+                    keyboardType: TextInputType.phone,
+                    maxLength: 11,
+                    validator: Validators.validatePhone,
+                  ),
+                  const SizedBox(height: AppDimensions.md),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: AppTextField(
+                          controller: _smsCodeController,
+                          hintText: AppStrings.smsCodeHint,
+                          keyboardType: TextInputType.number,
+                          maxLength: 6,
+                          validator: Validators.validateSmsCode,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppDimensions.md),
-                AppTextField(
-                  controller: _passwordController,
-                  hintText: AppStrings.passwordHint,
-                  obscureText: _obscurePassword,
-                  validator: Validators.validatePassword,
-                  onChanged: (_) => setState(() {}),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                    ),
-                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                      const SizedBox(width: AppDimensions.sm),
+                      SizedBox(
+                        width: 100,
+                        height: AppDimensions.buttonHeight,
+                        child: ElevatedButton(
+                          onPressed: _countdown > 0 ? null : _sendSmsCode,
+                          child: Text(
+                            _countdown > 0
+                                ? '${_countdown}s'
+                                : AppStrings.getSmsCode,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                if (_passwordController.text.isNotEmpty)
-                  _buildPasswordStrength(_passwordController.text),
-                const SizedBox(height: AppDimensions.md),
-                AppTextField(
-                  controller: _confirmPasswordController,
-                  hintText: '确认密码',
-                  obscureText: _obscureConfirm,
-                  validator: (v) =>
-                      Validators.validateConfirmPassword(v, _passwordController.text),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscureConfirm ? Icons.visibility_off : Icons.visibility,
+                  const SizedBox(height: AppDimensions.md),
+                  AppTextField(
+                    controller: _passwordController,
+                    hintText: AppStrings.passwordHint,
+                    obscureText: _obscurePassword,
+                    validator: Validators.validatePassword,
+                    onChanged: (_) => setState(() {}),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                      ),
+                      onPressed: () =>
+                          setState(() => _obscurePassword = !_obscurePassword),
                     ),
-                    onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
                   ),
-                ),
-                const SizedBox(height: AppDimensions.md),
-                Row(
-                  children: [
-                    Checkbox(
-                      value: _agreementAccepted,
-                      onChanged: (v) => setState(() => _agreementAccepted = v ?? false),
+                  if (_passwordController.text.isNotEmpty)
+                    _buildPasswordStrength(_passwordController.text),
+                  const SizedBox(height: AppDimensions.md),
+                  AppTextField(
+                    controller: _confirmPasswordController,
+                    hintText: '确认密码',
+                    obscureText: _obscureConfirm,
+                    validator: (v) =>
+                        Validators.validateConfirmPassword(v, _passwordController.text),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscureConfirm ? Icons.visibility_off : Icons.visibility,
+                      ),
+                      onPressed: () =>
+                          setState(() => _obscureConfirm = !_obscureConfirm),
                     ),
-                    const Text(AppStrings.agreementPrefix),
-                    TextButton(
+                  ),
+                  const SizedBox(height: AppDimensions.md),
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: _agreementAccepted,
+                        onChanged: (v) =>
+                            setState(() => _agreementAccepted = v ?? false),
+                      ),
+                      const Text(AppStrings.agreementPrefix),
+                      TextButton(
+                        onPressed: () => context.pop(),
+                        child: const Text(AppStrings.hasAccount),
+                      ),
+                      const Text(AppStrings.and),
+                      TextButton(
+                        onPressed: () {},
+                        child: const Text(AppStrings.privacyPolicy),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppDimensions.lg),
+                  BlocBuilder<AuthBloc, AuthState>(
+                    builder: (context, state) {
+                      return AppButton(
+                        text: '完成注册',
+                        isLoading: state.status == AuthStatus.loading,
+                        onPressed: _onRegister,
+                      );
+                    },
+                  ),
+                  const SizedBox(height: AppDimensions.md),
+                  Center(
+                    child: TextButton(
                       onPressed: () => context.pop(),
                       child: const Text(AppStrings.hasAccount),
                     ),
-                    const Text(AppStrings.and),
-                    TextButton(
-                      onPressed: () {},
-                      child: const Text(AppStrings.privacyPolicy),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppDimensions.lg),
-                BlocBuilder<AuthBloc, AuthState>(
-                  builder: (context, state) {
-                    return AppButton(
-                      text: '完成注册',
-                      isLoading: state.status == AuthStatus.loading,
-                      onPressed: _onRegister,
-                    );
-                  },
-                ),
-                const SizedBox(height: AppDimensions.md),
-                Center(
-                  child: TextButton(
-                    onPressed: () => context.pop(),
-                    child: const Text(AppStrings.hasAccount),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

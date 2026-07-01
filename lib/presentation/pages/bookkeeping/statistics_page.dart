@@ -22,6 +22,7 @@ class StatisticsPage extends StatefulWidget {
 class _StatisticsPageState extends State<StatisticsPage> {
   String _selectedPeriod = AppStrings.thisMonth;
   final _periods = [AppStrings.thisWeek, AppStrings.thisMonth, AppStrings.custom];
+  DateTimeRange? _customRange;
 
   @override
   void initState() {
@@ -41,6 +42,9 @@ class _StatisticsPageState extends State<StatisticsPage> {
     } else if (_selectedPeriod == AppStrings.thisMonth) {
       startDate = DateFormat('yyyy-MM-dd').format(DateTime(now.year, now.month, 1));
       endDate = Formatters.formatDate(now);
+    } else if (_selectedPeriod == AppStrings.custom && _customRange != null) {
+      startDate = DateFormat('yyyy-MM-dd').format(_customRange!.start);
+      endDate = DateFormat('yyyy-MM-dd').format(_customRange!.end);
     }
 
     context.read<BookkeepingBloc>().add(LoadStatistics(
@@ -66,15 +70,31 @@ class _StatisticsPageState extends State<StatisticsPage> {
                 itemBuilder: (context, index) {
                   final period = _periods[index];
                   final isSelected = _selectedPeriod == period;
-                  return ChoiceChip(
-                    label: Text(period),
-                    selected: isSelected,
-                    onSelected: (_) {
-                      setState(() => _selectedPeriod = period);
-                      _loadStatistics();
-                    },
-                  );
-                },
+                    return ChoiceChip(
+                      label: Text(period),
+                      selected: isSelected,
+                      onSelected: (_) async {
+                        if (period == AppStrings.custom) {
+                          final range = await showDateRangePicker(
+                            context: context,
+                            firstDate: DateTime(2020),
+                            lastDate: DateTime.now(),
+                            initialDateRange: _customRange,
+                          );
+                          if (range == null || !context.mounted) return;
+                          setState(() {
+                            _selectedPeriod = period;
+                            _customRange = range;
+                          });
+                        } else {
+                          setState(() {
+                            _selectedPeriod = period;
+                          });
+                        }
+                        _loadStatistics();
+                      },
+                    );
+                  },
               ),
             ),
             Expanded(
@@ -129,7 +149,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                 ],
               ),
             ),
-            Container(width: 1, height: 40, color: AppColors.divider),
+            Container(width: 1, height: 40, color: AppColors.textSecondary),
             Expanded(
               child: Column(
                 children: [

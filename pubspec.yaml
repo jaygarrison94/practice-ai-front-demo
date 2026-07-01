@@ -40,6 +40,9 @@ dependencies:
   # Utilities
   intl: ^0.20.2
   json_annotation: ^4.9.0
+  google_fonts: ^6.2.1
+  flutter_secure_storage_web: ^1.2.1
+  shared_preferences_web: ^2.4.3
 
 
 

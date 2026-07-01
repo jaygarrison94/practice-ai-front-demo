@@ -39,33 +39,36 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
     super.dispose();
   }
 
+  void _loadSchedules({String? keyword}) {
+    final now = DateTime.now();
+    String? date;
+    if (_selectedFilter == AppStrings.today) {
+      date = Formatters.formatDate(now);
+    } else if (_selectedFilter == AppStrings.tomorrow) {
+      date = Formatters.formatDate(now.add(const Duration(days: 1)));
+    }
+
+    context.read<ScheduleBloc>().add(LoadSchedules(
+          date: date,
+          category: _selectedCategory,
+          keyword: keyword,
+        ));
+  }
+
   void _onSearch(String keyword) {
-    context.read<ScheduleBloc>().add(LoadSchedules(keyword: keyword));
+    _loadSchedules(keyword: keyword);
   }
 
   void _onFilterChanged(String filter) {
     setState(() => _selectedFilter = filter);
-    String? date;
-    final now = DateTime.now();
-    if (filter == AppStrings.today) {
-      date = Formatters.formatDate(now);
-    } else if (filter == AppStrings.tomorrow) {
-      date = Formatters.formatDate(now.add(const Duration(days: 1)));
-    }
-    context.read<ScheduleBloc>().add(LoadSchedules(
-          date: date,
-          category: _selectedCategory,
-        ));
+    _loadSchedules(keyword: _searchController.text.trim().isEmpty ? null : _searchController.text.trim());
   }
 
   void _onCategoryChanged(String category) {
     setState(() {
       _selectedCategory = category == '全部' ? null : category;
     });
-    context.read<ScheduleBloc>().add(LoadSchedules(
-          date: _selectedFilter == AppStrings.all ? null : Formatters.formatDate(DateTime.now()),
-          category: _selectedCategory,
-        ));
+    _loadSchedules(keyword: _searchController.text.trim().isEmpty ? null : _searchController.text.trim());
   }
 
   @override
@@ -92,7 +95,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
                   _isSearching = !_isSearching;
                   if (!_isSearching) {
                     _searchController.clear();
-                    context.read<ScheduleBloc>().add(const LoadSchedules());
+                    _loadSchedules();
                   }
                 });
               },
@@ -100,9 +103,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
           ],
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            WidgetsBinding.instance.addPostFrameCallback((_) => context.push('/schedule/create'));
-          },
+          onPressed: () => context.push('/schedule/create'),
           child: const Icon(Icons.add),
         ),
         body: Column(
@@ -161,21 +162,36 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
   Widget _buildScheduleList() {
     return BlocBuilder<ScheduleBloc, ScheduleState>(
       builder: (context, state) {
+        final schedules = _selectedFilter == AppStrings.future
+            ? state.schedules.where((schedule) {
+                final date = DateTime.tryParse(schedule.scheduleDate);
+                if (date == null) return false;
+                final tomorrow = DateTime.now().add(const Duration(days: 1));
+                return DateTime(date.year, date.month, date.day).isAfter(
+                  DateTime(tomorrow.year, tomorrow.month, tomorrow.day),
+                );
+              }).toList()
+            : state.schedules;
+
         if (state.isLoading) {
           return const Center(child: CircularProgressIndicator());
         }
-        if (state.schedules.isEmpty) {
+        if (schedules.isEmpty) {
           return const EmptyState(message: '暂无日程');
         }
         return RefreshIndicator(
           onRefresh: () async {
-            context.read<ScheduleBloc>().add(const LoadSchedules());
+            _loadSchedules(
+              keyword: _searchController.text.trim().isEmpty
+                  ? null
+                  : _searchController.text.trim(),
+            );
           },
           child: ListView.builder(
             padding: const EdgeInsets.all(AppDimensions.md),
-            itemCount: state.schedules.length,
+            itemCount: schedules.length,
             itemBuilder: (context, index) {
-              final schedule = state.schedules[index];
+              final schedule = schedules[index];
               return Dismissible(
                 key: ValueKey(schedule.id),
                 direction: DismissDirection.endToStart,
@@ -191,7 +207,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
                 child: Card(
                   child: ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: AppColors.primaryLight,
+                      backgroundColor: AppColors.primary,
                       child: Text(
                         schedule.scheduleTime,
                         style: const TextStyle(fontSize: 12, color: Colors.white),
@@ -212,11 +228,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
                             visualDensity: VisualDensity.compact,
                           )
                         : null,
-                    onTap: () {
-                      WidgetsBinding.instance.addPostFrameCallback((_) => context.push(
-                        '/schedule/${schedule.id}',
-                      ));
-                    },
+                    onTap: () => context.push('/schedule/${schedule.id}'),
                   ),
                 ),
               );

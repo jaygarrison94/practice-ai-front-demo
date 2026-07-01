@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_dimensions.dart';
 
@@ -18,28 +19,45 @@ class AppButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: AppDimensions.buttonHeight,
-      child: ElevatedButton(
-        onPressed: isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor ?? AppColors.primary,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppDimensions.buttonRadius),
+    final color = backgroundColor ?? AppColors.primary;
+    return GestureDetector(
+      onTap: isLoading ? null : onPressed,
+      child: Container(
+        width: double.infinity,
+        height: AppDimensions.buttonHeight,
+        decoration: BoxDecoration(
+          color: color,
+          border: Border(
+            top: const BorderSide(color: AppColors.borderLight, width: AppDimensions.pixelBorder),
+            left: const BorderSide(color: AppColors.borderLight, width: AppDimensions.pixelBorder),
+            right: BorderSide(
+              color: onPressed != null ? AppColors.borderDark : color,
+              width: AppDimensions.pixelBorder,
+            ),
+            bottom: BorderSide(
+              color: onPressed != null ? AppColors.borderDark : color,
+              width: AppDimensions.pixelBorder,
+            ),
           ),
         ),
-        child: isLoading
-            ? const SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
+        child: Center(
+          child: isLoading
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: AppColors.textPrimary,
+                  ),
+                )
+              : Text(
+                  text,
+                  style: GoogleFonts.pressStart2p(
+                    fontSize: 11,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
-              )
-            : Text(text, style: const TextStyle(fontSize: 16)),
+        ),
       ),
     );
   }

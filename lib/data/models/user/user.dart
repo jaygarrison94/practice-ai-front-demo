@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'user_profile.dart';
 
 class User extends Equatable {
   final int id;

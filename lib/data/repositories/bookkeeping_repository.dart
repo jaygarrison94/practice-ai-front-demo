@@ -2,7 +2,6 @@ import '../../core/network/api_client.dart';
 import '../../core/constants/api_constants.dart';
 import '../models/bookkeeping/record.dart';
 import '../models/bookkeeping/record_create_request.dart';
-import '../models/bookkeeping/category.dart';
 import '../models/bookkeeping/statistics.dart';
 
 class BookkeepingRepository {

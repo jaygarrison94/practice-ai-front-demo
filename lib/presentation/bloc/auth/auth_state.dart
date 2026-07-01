@@ -5,11 +5,15 @@ import '../../../data/models/user/user_profile.dart';
 
 enum AuthStatus { initial, authenticated, unauthenticated, loading }
 
+const _unset = Object();
+
 class AuthState extends Equatable implements MessageState {
   final AuthStatus status;
   final User? user;
   final UserProfile? profile;
+  @override
   final String? error;
+  @override
   final String? successMessage;
 
   const AuthState({
@@ -24,15 +28,17 @@ class AuthState extends Equatable implements MessageState {
     AuthStatus? status,
     User? user,
     UserProfile? profile,
-    String? error,
-    String? successMessage,
+    Object? error = _unset,
+    Object? successMessage = _unset,
   }) {
     return AuthState(
       status: status ?? this.status,
       user: user ?? this.user,
       profile: profile ?? this.profile,
-      error: error ?? this.error,
-      successMessage: successMessage ?? this.successMessage,
+      error: identical(error, _unset) ? this.error : error as String?,
+      successMessage: identical(successMessage, _unset)
+          ? this.successMessage
+          : successMessage as String?,
     );
   }
 

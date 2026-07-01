@@ -1,7 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
-
 import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/app_dimensions.dart';
+
+class PixelNavItem {
+  final IconData icon;
+  final String label;
+  final String path;
+
+  const PixelNavItem({
+    required this.icon,
+    required this.label,
+    required this.path,
+  });
+}
+
+const _navItems = [
+  PixelNavItem(icon: Icons.home_outlined, label: 'HOME', path: '/home'),
+  PixelNavItem(icon: Icons.calendar_today_outlined, label: 'CAL', path: '/schedule'),
+  PixelNavItem(icon: Icons.receipt_long_outlined, label: 'BOOK', path: '/bookkeeping'),
+  PixelNavItem(icon: Icons.person_outline, label: 'PROFILE', path: '/profile'),
+];
 
 class MainShell extends StatelessWidget {
   final Widget child;
@@ -18,35 +38,55 @@ class MainShell extends StatelessWidget {
 
     return Scaffold(
       body: child,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: currentIndex,
-        onTap: (index) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            switch (index) {
-              case 0:
-                context.go('/home');
-              case 1:
-                context.go('/schedule');
-              case 2:
-                context.go('/bookkeeping');
-              case 3:
-                context.go('/profile');
-            }
-          });
-        },
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: AppColors.primary,
-        unselectedItemColor: AppColors.textHint,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: '首页'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_today_outlined), label: '日程'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.receipt_long_outlined), label: '记账'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline), label: '我的'),
-        ],
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          color: AppColors.background,
+          border: Border(
+            top: BorderSide(color: AppColors.borderLight, width: AppDimensions.pixelBorder),
+          ),
+        ),
+        child: Row(
+          children: List.generate(_navItems.length, (index) {
+            final item = _navItems[index];
+            final isSelected = index == currentIndex;
+            return Expanded(
+              child: GestureDetector(
+                onTap: () => context.go(item.path),
+                child: Container(
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: isSelected ? AppColors.backgroundLight : AppColors.background,
+                    border: isSelected
+                        ? null
+                        : const Border(
+                            right: BorderSide(color: AppColors.borderDark, width: 1),
+                          ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        item.icon,
+                        size: 18,
+                        color: isSelected ? AppColors.accent : AppColors.textSecondary,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        item.label,
+                        style: GoogleFonts.pressStart2p(
+                          fontSize: 6,
+                          color: isSelected ? AppColors.accent : AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }),
+        ),
       ),
     );
   }
 }
+

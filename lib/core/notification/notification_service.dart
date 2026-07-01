@@ -1,11 +1,19 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 class NotificationService {
-  final FlutterLocalNotificationsPlugin _plugin;
+  FlutterLocalNotificationsPlugin? _plugin;
 
-  NotificationService(this._plugin);
+  NotificationService();
 
   Future<void> init() async {
+    if (kIsWeb) return;
+
+    _plugin ??= FlutterLocalNotificationsPlugin();
+    Intl.defaultLocale = 'zh_CN';
+    await initializeDateFormatting('zh_CN');
     const androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosSettings = DarwinInitializationSettings(
@@ -17,7 +25,9 @@ class NotificationService {
       android: androidSettings,
       iOS: iosSettings,
     );
-    await _plugin.initialize(settings);
+    try {
+      await _plugin!.initialize(settings);
+    } catch (_) {}
   }
 
   Future<void> showScheduleReminder({
@@ -25,6 +35,7 @@ class NotificationService {
     required String title,
     required String body,
   }) async {
+    if (_plugin == null) return;
     const androidDetails = AndroidNotificationDetails(
       'schedule_channel',
       '日程提醒',
@@ -37,6 +48,8 @@ class NotificationService {
       android: androidDetails,
       iOS: iosDetails,
     );
-    await _plugin.show(id, title, body, details);
+    try {
+      await _plugin!.show(id, title, body, details);
+    } catch (_) {}
   }
 }

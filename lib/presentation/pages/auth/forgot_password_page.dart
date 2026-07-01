@@ -38,7 +38,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   void _sendSmsCode() {
     if (Validators.validatePhone(_phoneController.text) != null) return;
     context.read<AuthBloc>().add(SendSmsCode(_phoneController.text));
-    _startCountdown();
   }
 
   void _startCountdown() {
@@ -63,80 +62,96 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MessageBlocListener<AuthBloc, AuthState>(
-      popOnSuccess: true,
-      child: Scaffold(
-        appBar: AppBar(title: const Text('忘记密码')),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppDimensions.lg),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: AppDimensions.xxl),
-                const Text(
-                  '重置密码',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  '通过手机验证码重置您的密码',
-                  style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
-                ),
-                const SizedBox(height: AppDimensions.xl),
-                AppTextField(
-                  controller: _phoneController,
-                  hintText: AppStrings.phoneHint,
-                  keyboardType: TextInputType.phone,
-                  maxLength: 11,
-                  validator: Validators.validatePhone,
-                ),
-                const SizedBox(height: AppDimensions.md),
-                Row(
-                  children: [
-                    Expanded(
-                      child: AppTextField(
-                        controller: _smsCodeController,
-                        hintText: AppStrings.smsCodeHint,
-                        keyboardType: TextInputType.number,
-                        maxLength: 6,
-                        validator: Validators.validateSmsCode,
-                      ),
-                    ),
-                    const SizedBox(width: AppDimensions.sm),
-                    SizedBox(
-                      height: AppDimensions.buttonHeight,
-                      child: ElevatedButton(
-                        onPressed: _countdown > 0 ? null : _sendSmsCode,
-                        child: Text(
-                          _countdown > 0 ? '${_countdown}s' : AppStrings.getSmsCode,
+    return BlocListener<AuthBloc, AuthState>(
+      listenWhen: (previous, current) =>
+          previous.successMessage != current.successMessage,
+      listener: (context, state) {
+        if (state.successMessage == '验证码已发送' && _countdown == 0) {
+          _startCountdown();
+        }
+      },
+      child: MessageBlocListener<AuthBloc, AuthState>(
+        popOnSuccess: true,
+        child: Scaffold(
+          appBar: AppBar(title: const Text('忘记密码')),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(AppDimensions.lg),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: AppDimensions.xxl),
+                  const Text(
+                    '重置密码',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    '通过手机验证码重置您的密码',
+                    style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+                  ),
+                  const SizedBox(height: AppDimensions.xl),
+                  AppTextField(
+                    controller: _phoneController,
+                    hintText: AppStrings.phoneHint,
+                    keyboardType: TextInputType.phone,
+                    maxLength: 11,
+                    validator: Validators.validatePhone,
+                  ),
+                  const SizedBox(height: AppDimensions.md),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: AppTextField(
+                          controller: _smsCodeController,
+                          hintText: AppStrings.smsCodeHint,
+                          keyboardType: TextInputType.number,
+                          maxLength: 6,
+                          validator: Validators.validateSmsCode,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppDimensions.md),
-                AppTextField(
-                  controller: _passwordController,
-                  hintText: '新密码',
-                  obscureText: true,
-                  validator: Validators.validatePassword,
-                ),
-                const SizedBox(height: AppDimensions.md),
-                AppTextField(
-                  controller: _confirmPasswordController,
-                  hintText: '确认新密码',
-                  obscureText: true,
-                  validator: (v) =>
-                      Validators.validateConfirmPassword(v, _passwordController.text),
-                ),
-                const SizedBox(height: AppDimensions.xl),
-                AppButton(
-                  text: '完成重置',
-                  onPressed: _onReset,
-                ),
-              ],
+                      const SizedBox(width: AppDimensions.sm),
+                      SizedBox(
+                        height: AppDimensions.buttonHeight,
+                        child: ElevatedButton(
+                          onPressed: _countdown > 0 ? null : _sendSmsCode,
+                          child: Text(
+                            _countdown > 0
+                                ? '${_countdown}s'
+                                : AppStrings.getSmsCode,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppDimensions.md),
+                  AppTextField(
+                    controller: _passwordController,
+                    hintText: '新密码',
+                    obscureText: true,
+                    validator: Validators.validatePassword,
+                  ),
+                  const SizedBox(height: AppDimensions.md),
+                  AppTextField(
+                    controller: _confirmPasswordController,
+                    hintText: '确认新密码',
+                    obscureText: true,
+                    validator: (v) =>
+                        Validators.validateConfirmPassword(v, _passwordController.text),
+                  ),
+                  const SizedBox(height: AppDimensions.xl),
+                  BlocBuilder<AuthBloc, AuthState>(
+                    builder: (context, state) {
+                      return AppButton(
+                        text: '完成重置',
+                        isLoading: state.status == AuthStatus.loading,
+                        onPressed: _onReset,
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),

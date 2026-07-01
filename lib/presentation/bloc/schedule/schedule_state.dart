@@ -6,7 +6,9 @@ class ScheduleState extends Equatable implements MessageState {
   final List<Schedule> schedules;
   final Schedule? selectedSchedule;
   final bool isLoading;
+  @override
   final String? error;
+  @override
   final String? successMessage;
 
   const ScheduleState({

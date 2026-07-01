@@ -15,16 +15,26 @@ import '../../bloc/bookkeeping/bookkeeping_bloc.dart';
 import '../../bloc/bookkeeping/bookkeeping_event.dart';
 import '../../bloc/bookkeeping/bookkeeping_state.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       context.read<ScheduleBloc>().add(const LoadSchedules());
       context.read<BookkeepingBloc>().add(const LoadRecords());
     });
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return MessageBlocListener<ScheduleBloc, ScheduleState>(
       child: MessageBlocListener<BookkeepingBloc, BookkeepingState>(
         child: Scaffold(
@@ -72,13 +82,12 @@ class HomePage extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 24,
-                  backgroundColor: AppColors.primaryLight,
+                  backgroundColor: AppColors.primary,
                   child: Text(
                     nickname.isNotEmpty ? nickname[0] : '用',
                     style: const TextStyle(
                       fontSize: 20,
                       color: Colors.white,
-                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
@@ -118,9 +127,7 @@ class HomePage extends StatelessWidget {
             icon: Icons.calendar_today,
             label: '新建日程',
             color: AppColors.primary,
-            onTap: () {
-              WidgetsBinding.instance.addPostFrameCallback((_) => context.push('/schedule/create'));
-            },
+            onTap: () => context.push('/schedule/create'),
           ),
         ),
         const SizedBox(width: AppDimensions.md),
@@ -129,9 +136,7 @@ class HomePage extends StatelessWidget {
             icon: Icons.receipt_long,
             label: '记一笔',
             color: AppColors.income,
-            onTap: () {
-              WidgetsBinding.instance.addPostFrameCallback((_) => context.push('/bookkeeping/create'));
-            },
+            onTap: () => context.push('/bookkeeping/create'),
           ),
         ),
       ],
@@ -162,9 +167,7 @@ class HomePage extends StatelessWidget {
                       ),
                     ),
                     TextButton(
-                      onPressed: () {
-                        WidgetsBinding.instance.addPostFrameCallback((_) => context.push('/schedule'));
-                      },
+                      onPressed: () => context.push('/schedule'),
                       child: const Text('查看全部'),
                     ),
                   ],
@@ -175,14 +178,14 @@ class HomePage extends StatelessWidget {
                     child: Center(
                       child: Text(
                         '今日暂无日程',
-                        style: TextStyle(color: AppColors.textHint),
+                        style: TextStyle(color: AppColors.textSecondary),
                       ),
                     ),
                   )
                 else
                   ...todaySchedules.take(3).map(
                         (s) => ListTile(
-                          leading: Icon(
+                          leading: const Icon(
                             Icons.circle,
                             size: 12,
                             color: AppColors.primary,
@@ -230,9 +233,7 @@ class HomePage extends StatelessWidget {
                       ),
                     ),
                     TextButton(
-                      onPressed: () {
-                        WidgetsBinding.instance.addPostFrameCallback((_) => context.push('/bookkeeping'));
-                      },
+                      onPressed: () => context.push('/bookkeeping'),
                       child: const Text('查看全部'),
                     ),
                   ],
@@ -283,7 +284,7 @@ class _ActionCard extends StatelessWidget {
     return Card(
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppDimensions.cardRadius),
+        borderRadius: BorderRadius.zero,
         child: Padding(
           padding: const EdgeInsets.all(AppDimensions.lg),
           child: Column(

@@ -1,7 +1,14 @@
+import 'package:flutter/foundation.dart';
+
 class ApiConstants {
   ApiConstants._();
 
-  static const String baseUrl = 'http://localhost:8444/api';
+  static String get baseUrl {
+    if (kIsWeb) {
+      return 'http://localhost:8444/api';
+    }
+    return 'http://10.0.2.2:8444/api';
+  }
 
   // User
   static const String smsCode = '/user/sms-code';

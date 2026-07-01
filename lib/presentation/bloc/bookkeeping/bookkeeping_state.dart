@@ -9,7 +9,9 @@ class BookkeepingState extends Equatable implements MessageState {
   final StatisticsResult? statistics;
   final int selectedType;
   final bool isLoading;
+  @override
   final String? error;
+  @override
   final String? successMessage;
 
   const BookkeepingState({

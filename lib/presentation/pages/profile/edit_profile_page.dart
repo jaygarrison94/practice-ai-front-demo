@@ -64,9 +64,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
   void _onSave() {
     if (_formKey.currentState?.validate() != true) return;
 
+    if (_avatarPath != null) {
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text('当前版本暂不支持头像上传，请先仅保存文字资料'),
+            duration: Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+    }
+
     context.read<AuthBloc>().add(UpdateProfile(
           nickname: _nicknameController.text,
-          avatar: _avatarPath,
+          avatar: null,
           gender: _gender,
           birthday: _birthday?.toIso8601String(),
         ));
@@ -89,7 +101,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   onTap: _pickImage,
                   child: CircleAvatar(
                     radius: 48,
-                    backgroundColor: AppColors.primaryLight,
+                    backgroundColor: AppColors.primary,
                     backgroundImage: _avatarPath != null
                         ? FileImage(File(_avatarPath!))
                         : null,
@@ -113,7 +125,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
                 const SizedBox(height: AppDimensions.md),
                 DropdownButtonFormField<String>(
-                  value: _gender,
+                  initialValue: _gender,
                   decoration: const InputDecoration(labelText: AppStrings.gender),
                   items: _genders
                       .map((g) => DropdownMenuItem(value: g, child: Text(g)))

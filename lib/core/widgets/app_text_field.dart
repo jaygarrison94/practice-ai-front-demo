@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../constants/app_colors.dart';
 import '../constants/app_dimensions.dart';
 
 class AppTextField extends StatelessWidget {
@@ -15,6 +17,7 @@ class AppTextField extends StatelessWidget {
   final bool enabled;
   final TextInputAction? textInputAction;
   final FocusNode? focusNode;
+  final int maxLines;
 
   const AppTextField({
     super.key,
@@ -31,26 +34,52 @@ class AppTextField extends StatelessWidget {
     this.enabled = true,
     this.textInputAction,
     this.focusNode,
+    this.maxLines = 1,
   });
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      validator: validator,
-      obscureText: obscureText,
-      keyboardType: keyboardType,
-      onChanged: onChanged,
-      maxLength: maxLength,
-      enabled: enabled,
-      textInputAction: textInputAction,
-      focusNode: focusNode,
-      decoration: InputDecoration(
-        hintText: hintText,
-        labelText: labelText,
-        suffixIcon: suffixIcon,
-        prefixIcon: prefixIcon,
-        counterText: '',
+    return Container(
+      decoration: const BoxDecoration(
+        color: AppColors.background,
+        border: Border(
+          top: BorderSide(color: AppColors.borderDark, width: AppDimensions.pixelBorder),
+          left: BorderSide(color: AppColors.borderDark, width: AppDimensions.pixelBorder),
+          right: BorderSide(color: AppColors.borderLight, width: AppDimensions.pixelBorder),
+          bottom: BorderSide(color: AppColors.borderLight, width: AppDimensions.pixelBorder),
+        ),
+      ),
+      child: TextFormField(
+        controller: controller,
+        validator: validator,
+        obscureText: obscureText,
+        keyboardType: keyboardType,
+        onChanged: onChanged,
+        maxLength: maxLength,
+        maxLines: obscureText ? 1 : maxLines,
+        enabled: enabled,
+        textInputAction: textInputAction,
+        focusNode: focusNode,
+        style: GoogleFonts.pressStart2p(
+          fontSize: 10,
+          color: AppColors.textPrimary,
+        ),
+        decoration: InputDecoration(
+          hintText: hintText,
+          labelText: labelText,
+          suffixIcon: suffixIcon,
+          prefixIcon: prefixIcon,
+          counterText: '',
+          hintStyle: GoogleFonts.pressStart2p(fontSize: 8, color: AppColors.textSecondary),
+          labelStyle: GoogleFonts.pressStart2p(fontSize: 10, color: AppColors.textPrimary),
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.sm,
+            vertical: AppDimensions.sm,
+          ),
+        ),
       ),
     );
   }
