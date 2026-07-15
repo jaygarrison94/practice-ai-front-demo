@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'core/constants/app_strings.dart';
 import 'core/network/api_client.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/skin_controller.dart';
 import 'core/notification/notification_service.dart';
 import 'core/widgets/crt_overlay.dart';
 import 'data/datasources/auth_local_datasource.dart';
@@ -36,6 +37,7 @@ import 'presentation/pages/bookkeeping/record_form_page.dart';
 import 'presentation/pages/bookkeeping/statistics_page.dart';
 import 'presentation/pages/profile/profile_page.dart';
 import 'presentation/pages/profile/edit_profile_page.dart';
+import 'presentation/pages/profile/skin_settings_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,6 +50,9 @@ Future<void> _initDependencies() async {
 
   const secureStorage = FlutterSecureStorage();
   getIt.registerSingleton(secureStorage);
+
+  await SkinController.instance.init(secureStorage);
+  getIt.registerSingleton(SkinController.instance);
 
   final authLocalDS = AuthLocalDataSource(secureStorage);
   getIt.registerSingleton(authLocalDS);
@@ -230,6 +235,10 @@ class _MyAppState extends State<MyApp> {
             child: const EditProfilePage(),
           ),
         ),
+        GoRoute(
+          path: '/profile/skin',
+          builder: (context, state) => const SkinSettingsPage(),
+        ),
       ],
     );
   }
@@ -251,22 +260,27 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(create: (_) => ScheduleBloc(getIt<ScheduleRepository>())),
         BlocProvider(create: (_) => BookkeepingBloc(getIt<BookkeepingRepository>())),
       ],
-      child: MaterialApp.router(
-        title: AppStrings.appName,
-        theme: AppTheme.lightTheme,
-        routerConfig: _router,
-        debugShowCheckedModeBanner: false,
-        localizationsDelegates: const [
-          DefaultMaterialLocalizations.delegate,
-          DefaultWidgetsLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-        ],
-        supportedLocales: const [
-          Locale('zh', 'CN'),
-          Locale('en', 'US'),
-        ],
-        builder: (context, child) => CrtOverlay(child: child!),
+      child: AnimatedBuilder(
+        animation: SkinController.instance,
+        builder: (context, _) {
+          return MaterialApp.router(
+            title: AppStrings.appName,
+            theme: AppTheme.lightTheme,
+            routerConfig: _router,
+            debugShowCheckedModeBanner: false,
+            localizationsDelegates: const [
+              DefaultMaterialLocalizations.delegate,
+              DefaultWidgetsLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('zh', 'CN'),
+              Locale('en', 'US'),
+            ],
+            builder: (context, child) => CrtOverlay(child: child!),
+          );
+        },
       ),
     );
   }

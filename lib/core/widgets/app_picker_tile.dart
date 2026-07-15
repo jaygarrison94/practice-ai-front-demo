@@ -22,7 +22,7 @@ class AppPickerTile extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppColors.background,
           border: Border(
             top: BorderSide(

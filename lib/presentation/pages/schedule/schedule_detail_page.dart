@@ -153,7 +153,7 @@ class _ScheduleDetailPageState extends State<ScheduleDetailPage> {
           const SizedBox(width: AppDimensions.sm),
           Text(
             '$label：',
-            style: const TextStyle(color: AppColors.textSecondary),
+            style: TextStyle(color: AppColors.textSecondary),
           ),
           Text(value),
         ],

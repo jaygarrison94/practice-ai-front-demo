@@ -78,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   '请输入您的账号信息',
                   style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
                 ),

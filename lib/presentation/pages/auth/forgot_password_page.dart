@@ -87,10 +87,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    '通过手机验证码重置您的密码',
-                    style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
-                  ),
+                Text(
+                  '通过手机验证码重置您的密码',
+                  style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+                ),
                   const SizedBox(height: AppDimensions.xl),
                   AppTextField(
                     controller: _phoneController,

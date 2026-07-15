@@ -68,7 +68,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             Text(
                               phone.isNotEmpty ? phone : '',
-                              style: const TextStyle(color: AppColors.textSecondary),
+                              style: TextStyle(color: AppColors.textSecondary),
                             ),
                           ],
                         ),
@@ -90,6 +90,13 @@ class _ProfilePageState extends State<ProfilePage> {
                         Icons.notifications_outlined,
                         AppStrings.settings,
                         () {},
+                      ),
+                      const Divider(height: 1, indent: AppDimensions.xxl),
+                      _buildMenuItem(
+                        context,
+                        Icons.palette_outlined,
+                        '主题皮肤',
+                        () => context.push('/profile/skin'),
                       ),
                       const Divider(height: 1, indent: AppDimensions.xxl),
                       _buildMenuItem(

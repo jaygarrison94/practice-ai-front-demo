@@ -231,7 +231,7 @@ class _TypeToggle extends StatelessWidget {
           height: 48,
           decoration: BoxDecoration(
             color: isSelected ? color : AppColors.backgroundLight,
-            border: const Border(
+            border: Border(
               top: BorderSide(color: AppColors.borderLight, width: AppDimensions.pixelBorder),
               left: BorderSide(color: AppColors.borderLight, width: AppDimensions.pixelBorder),
               right: BorderSide(color: AppColors.borderDark, width: AppDimensions.pixelBorder),

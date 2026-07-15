@@ -173,8 +173,8 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
                 if (todaySchedules.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: AppDimensions.lg),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: AppDimensions.lg),
                     child: Center(
                       child: Text(
                         '今日暂无日程',
@@ -185,7 +185,7 @@ class _HomePageState extends State<HomePage> {
                 else
                   ...todaySchedules.take(3).map(
                         (s) => ListTile(
-                          leading: const Icon(
+                          leading: Icon(
                             Icons.circle,
                             size: 12,
                             color: AppColors.primary,
@@ -315,7 +315,7 @@ class _StatItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(label, style: const TextStyle(color: AppColors.textSecondary)),
+        Text(label, style: TextStyle(color: AppColors.textSecondary)),
         const SizedBox(height: 4),
         Text(
           Formatters.formatAmount(amount),

@@ -1,30 +1,32 @@
 import 'package:flutter/material.dart';
+import '../theme/skin_controller.dart';
 
 class AppColors {
   AppColors._();
 
-  // EVA Unit-01 inspired palette
-  static const Color primary = Color(0xFF6A0DAD);
-  static const Color primaryDark = Color(0xFF3A0050);
-  static const Color accent = Color(0xFF00FF41);
+  static final _controller = SkinController.instance;
 
-  static const Color income = Color(0xFF00FF41);
-  static const Color expense = Color(0xFFFF4500);
+  static Color get primary => _controller.skin.primary;
+  static Color get primaryDark => _controller.skin.primaryDark;
+  static Color get accent => _controller.skin.accent;
 
-  static const Color surface = Color(0xFF1A1A2E);
-  static const Color surfaceDark = Color(0xFF0D0D1A);
+  static Color get income => _controller.skin.income;
+  static Color get expense => _controller.skin.expense;
 
-  static const Color background = Color(0xFF0A0A0A);
-  static const Color backgroundLight = Color(0xFF1A1A2E);
+  static Color get surface => _controller.skin.surface;
+  static Color get surfaceDark => _controller.skin.surfaceDark;
 
-  static const Color textPrimary = Color(0xFFFFFFFF);
-  static const Color textSecondary = Color(0xFF888888);
-  static const Color textDark = Color(0xFF0A0A0A);
+  static Color get background => _controller.skin.background;
+  static Color get backgroundLight => _controller.skin.backgroundLight;
 
-  static const Color borderLight = Color(0xFF00FF41);
-  static const Color borderDark = Color(0xFF3A0050);
+  static Color get textPrimary => _controller.skin.textPrimary;
+  static Color get textSecondary => _controller.skin.textSecondary;
+  static Color get textDark => _controller.skin.textDark;
 
-  static const Color error = Color(0xFFFF0000);
-  static const Color success = Color(0xFF00FF41);
-  static const Color warning = Color(0xFFFF4500);
+  static Color get borderLight => _controller.skin.borderLight;
+  static Color get borderDark => _controller.skin.borderDark;
+
+  static Color get error => _controller.skin.error;
+  static Color get success => _controller.skin.success;
+  static Color get warning => _controller.skin.warning;
 }

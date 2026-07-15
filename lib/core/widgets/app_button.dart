@@ -28,8 +28,8 @@ class AppButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: color,
           border: Border(
-            top: const BorderSide(color: AppColors.borderLight, width: AppDimensions.pixelBorder),
-            left: const BorderSide(color: AppColors.borderLight, width: AppDimensions.pixelBorder),
+            top: BorderSide(color: AppColors.borderLight, width: AppDimensions.pixelBorder),
+            left: BorderSide(color: AppColors.borderLight, width: AppDimensions.pixelBorder),
             right: BorderSide(
               color: onPressed != null ? AppColors.borderDark : color,
               width: AppDimensions.pixelBorder,
@@ -42,7 +42,7 @@ class AppButton extends StatelessWidget {
         ),
         child: Center(
           child: isLoading
-              ? const SizedBox(
+              ? SizedBox(
                   width: 20,
                   height: 20,
                   child: CircularProgressIndicator(

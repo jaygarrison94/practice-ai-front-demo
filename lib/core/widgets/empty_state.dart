@@ -23,7 +23,7 @@ class EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.inbox_outlined,
               size: 64,
               color: AppColors.textSecondary,
@@ -45,7 +45,7 @@ class EmptyState extends StatelessWidget {
                     horizontal: AppDimensions.md,
                     vertical: AppDimensions.sm,
                   ),
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: AppColors.primary,
                     border: Border(
                       top: BorderSide(color: AppColors.borderLight, width: AppDimensions.pixelBorder),

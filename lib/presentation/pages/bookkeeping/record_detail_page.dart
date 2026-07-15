@@ -130,7 +130,7 @@ class _RecordDetailPageState extends State<RecordDetailPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(color: AppColors.textSecondary)),
+          Text(label, style: TextStyle(color: AppColors.textSecondary)),
           Text(value),
         ],
       ),

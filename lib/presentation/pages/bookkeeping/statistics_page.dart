@@ -135,12 +135,12 @@ class _StatisticsPageState extends State<StatisticsPage> {
             Expanded(
               child: Column(
                 children: [
-                  const Text('总收入',
+                  Text('总收入',
                       style: TextStyle(color: AppColors.textSecondary)),
                   const SizedBox(height: 4),
                   Text(
                     Formatters.formatAmount(stats.totalIncome),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: AppColors.income,
@@ -153,12 +153,12 @@ class _StatisticsPageState extends State<StatisticsPage> {
             Expanded(
               child: Column(
                 children: [
-                  const Text('总支出',
+                  Text('总支出',
                       style: TextStyle(color: AppColors.textSecondary)),
                   const SizedBox(height: 4),
                   Text(
                     Formatters.formatAmount(stats.totalExpense),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: AppColors.expense,

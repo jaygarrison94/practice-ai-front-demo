@@ -39,7 +39,7 @@ class MainShell extends StatelessWidget {
     return Scaffold(
       body: child,
       bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppColors.background,
           border: Border(
             top: BorderSide(color: AppColors.borderLight, width: AppDimensions.pixelBorder),
@@ -58,7 +58,7 @@ class MainShell extends StatelessWidget {
                     color: isSelected ? AppColors.backgroundLight : AppColors.background,
                     border: isSelected
                         ? null
-                        : const Border(
+                        : Border(
                             right: BorderSide(color: AppColors.borderDark, width: 1),
                           ),
                   ),
@@ -89,4 +89,3 @@ class MainShell extends StatelessWidget {
     );
   }
 }
-

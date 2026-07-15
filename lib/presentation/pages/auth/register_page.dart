@@ -104,10 +104,10 @@ class _RegisterPageState extends State<RegisterPage> {
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    '注册您的私人管家账号',
-                    style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
-                  ),
+                Text(
+                  '注册您的私人管家账号',
+                  style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+                ),
                   const SizedBox(height: AppDimensions.xl),
                   AppTextField(
                     controller: _phoneController,

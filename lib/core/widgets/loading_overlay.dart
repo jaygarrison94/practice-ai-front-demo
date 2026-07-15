@@ -25,7 +25,7 @@ class LoadingOverlay extends StatelessWidget {
             child: Center(
               child: Container(
                 padding: const EdgeInsets.all(AppDimensions.lg),
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: AppColors.backgroundLight,
                   border: Border(
                     top: BorderSide(color: AppColors.borderLight, width: AppDimensions.pixelBorder),
@@ -37,7 +37,7 @@ class LoadingOverlay extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const SizedBox(
+                    SizedBox(
                       width: 24,
                       height: 24,
                       child: CircularProgressIndicator(

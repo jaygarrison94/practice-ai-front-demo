@@ -32,7 +32,7 @@ class AppTheme {
         labelMedium: pixelText.copyWith(fontSize: 10),
         labelSmall: pixelText.copyWith(fontSize: 8),
       ),
-      colorScheme: const ColorScheme.dark(
+      colorScheme: ColorScheme.dark(
         primary: AppColors.primary,
         surface: AppColors.backgroundLight,
         onSurface: AppColors.textPrimary,
@@ -45,10 +45,10 @@ class AppTheme {
         surfaceTintColor: Colors.transparent,
         titleTextStyle: pixelText.copyWith(fontSize: 14, color: AppColors.accent),
       ),
-      cardTheme: const CardThemeData(
+      cardTheme: CardThemeData(
         elevation: 0,
         color: AppColors.backgroundLight,
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.zero,
         ),
       ),
@@ -98,7 +98,7 @@ class AppTheme {
           color: AppColors.textPrimary,
         ),
       ),
-      dividerTheme: const DividerThemeData(
+      dividerTheme: DividerThemeData(
         color: AppColors.textSecondary,
         thickness: 1,
       ),
@@ -116,10 +116,10 @@ class AppTheme {
           side: BorderSide.none,
         ),
       ),
-      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textPrimary,
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.zero,
         ),
         elevation: 0,
@@ -154,7 +154,7 @@ class AppTheme {
           return AppColors.backgroundLight;
         }),
       ),
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: AppColors.background,
         selectedItemColor: AppColors.accent,
         unselectedItemColor: AppColors.textSecondary,

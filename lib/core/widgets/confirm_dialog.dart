@@ -44,7 +44,7 @@ class ConfirmDialog extends StatelessWidget {
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppColors.backgroundLight,
           border: Border(
             top: BorderSide(color: AppColors.borderLight, width: AppDimensions.pixelBorder),
@@ -81,7 +81,7 @@ class ConfirmDialog extends StatelessWidget {
                     onTap: () => Navigator.of(context).pop(false),
                     child: Container(
                       height: AppDimensions.buttonHeight,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: AppColors.backgroundLight,
                         border: Border(
                           top: BorderSide(color: AppColors.borderLight, width: AppDimensions.pixelBorder),
@@ -108,7 +108,7 @@ class ConfirmDialog extends StatelessWidget {
                     onTap: onConfirm,
                     child: Container(
                       height: AppDimensions.buttonHeight,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: AppColors.primary,
                         border: Border(
                           top: BorderSide(color: AppColors.borderLight, width: AppDimensions.pixelBorder),

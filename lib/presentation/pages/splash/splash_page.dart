@@ -28,7 +28,7 @@ class SplashPage extends StatelessWidget {
             children: [
               Container(
                 padding: const EdgeInsets.all(AppDimensions.lg),
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: AppColors.backgroundLight,
                   border: Border(
                     top: BorderSide(color: AppColors.borderLight, width: AppDimensions.pixelBorder),
@@ -39,7 +39,7 @@ class SplashPage extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.auto_awesome,
                       size: 48,
                       color: AppColors.primary,
