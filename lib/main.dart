@@ -69,6 +69,13 @@ Future<void> _initDependencies() async {
   getIt.registerSingleton(BookkeepingRepository(apiClient));
 }
 
+Page<void> _noTransitionPage(GoRouterState state, Widget child) {
+  return NoTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+  );
+}
+
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
@@ -121,123 +128,177 @@ class _MyAppState extends State<MyApp> {
       routes: [
         GoRoute(
           path: '/splash',
-          builder: (context, state) => BlocProvider.value(
-            value: _authBloc,
-            child: const SplashPage(),
+          pageBuilder: (context, state) => _noTransitionPage(
+            state,
+            BlocProvider.value(
+              value: _authBloc,
+              child: const SplashPage(),
+            ),
           ),
         ),
         GoRoute(
           path: '/login',
-          builder: (context, state) => BlocProvider.value(
-            value: _authBloc,
-            child: const LoginPage(),
+          pageBuilder: (context, state) => _noTransitionPage(
+            state,
+            BlocProvider.value(
+              value: _authBloc,
+              child: const LoginPage(),
+            ),
           ),
         ),
         GoRoute(
           path: '/register',
-          builder: (context, state) => BlocProvider.value(
-            value: _authBloc,
-            child: const RegisterPage(),
+          pageBuilder: (context, state) => _noTransitionPage(
+            state,
+            BlocProvider.value(
+              value: _authBloc,
+              child: const RegisterPage(),
+            ),
           ),
         ),
         GoRoute(
           path: '/forgot-password',
-          builder: (context, state) => BlocProvider.value(
-            value: _authBloc,
-            child: const ForgotPasswordPage(),
+          pageBuilder: (context, state) => _noTransitionPage(
+            state,
+            BlocProvider.value(
+              value: _authBloc,
+              child: const ForgotPasswordPage(),
+            ),
           ),
         ),
         ShellRoute(
           builder: (context, state, child) => BlocProvider.value(
             value: _authBloc,
-            child: MainShell(child: child),
+            child: MainShell(
+              currentIndex: mainNavIndexForLocation(state.uri.toString()),
+              child: child,
+            ),
           ),
           routes: [
             GoRoute(
               path: '/home',
-              builder: (context, state) => const HomePage(),
+              pageBuilder: (context, state) => _noTransitionPage(
+                state,
+                const HomePage(),
+              ),
             ),
             GoRoute(
               path: '/schedule',
-              builder: (context, state) => const ScheduleListPage(),
+              pageBuilder: (context, state) => _noTransitionPage(
+                state,
+                const ScheduleListPage(),
+              ),
             ),
             GoRoute(
               path: '/bookkeeping',
-              builder: (context, state) => const RecordListPage(),
+              pageBuilder: (context, state) => _noTransitionPage(
+                state,
+                const RecordListPage(),
+              ),
             ),
             GoRoute(
               path: '/profile',
-              builder: (context, state) => const ProfilePage(),
+              pageBuilder: (context, state) => _noTransitionPage(
+                state,
+                const ProfilePage(),
+              ),
             ),
           ],
         ),
         GoRoute(
           path: '/schedule/create',
-          builder: (context, state) => BlocProvider.value(
-            value: _authBloc,
-            child: const ScheduleFormPage(),
+          pageBuilder: (context, state) => _noTransitionPage(
+            state,
+            BlocProvider.value(
+              value: _authBloc,
+              child: const ScheduleFormPage(),
+            ),
           ),
         ),
         GoRoute(
           path: '/schedule/edit/:id',
-          builder: (context, state) => BlocProvider.value(
-            value: _authBloc,
-            child: ScheduleFormPage(
-              scheduleId: int.parse(state.pathParameters['id']!),
+          pageBuilder: (context, state) => _noTransitionPage(
+            state,
+            BlocProvider.value(
+              value: _authBloc,
+              child: ScheduleFormPage(
+                scheduleId: int.parse(state.pathParameters['id']!),
+              ),
             ),
           ),
         ),
         GoRoute(
           path: '/schedule/:id',
-          builder: (context, state) => BlocProvider.value(
-            value: _authBloc,
-            child: ScheduleDetailPage(
-              scheduleId: int.parse(state.pathParameters['id']!),
+          pageBuilder: (context, state) => _noTransitionPage(
+            state,
+            BlocProvider.value(
+              value: _authBloc,
+              child: ScheduleDetailPage(
+                scheduleId: int.parse(state.pathParameters['id']!),
+              ),
             ),
           ),
         ),
         GoRoute(
           path: '/bookkeeping/create',
-          builder: (context, state) => BlocProvider.value(
-            value: _authBloc,
-            child: const RecordFormPage(),
+          pageBuilder: (context, state) => _noTransitionPage(
+            state,
+            BlocProvider.value(
+              value: _authBloc,
+              child: const RecordFormPage(),
+            ),
           ),
         ),
         GoRoute(
           path: '/bookkeeping/edit/:id',
-          builder: (context, state) => BlocProvider.value(
-            value: _authBloc,
-            child: RecordFormPage(
-              recordId: int.parse(state.pathParameters['id']!),
+          pageBuilder: (context, state) => _noTransitionPage(
+            state,
+            BlocProvider.value(
+              value: _authBloc,
+              child: RecordFormPage(
+                recordId: int.parse(state.pathParameters['id']!),
+              ),
             ),
           ),
         ),
         GoRoute(
           path: '/bookkeeping/:id',
-          builder: (context, state) => BlocProvider.value(
-            value: _authBloc,
-            child: RecordDetailPage(
-              recordId: int.parse(state.pathParameters['id']!),
+          pageBuilder: (context, state) => _noTransitionPage(
+            state,
+            BlocProvider.value(
+              value: _authBloc,
+              child: RecordDetailPage(
+                recordId: int.parse(state.pathParameters['id']!),
+              ),
             ),
           ),
         ),
         GoRoute(
           path: '/bookkeeping/statistics',
-          builder: (context, state) => BlocProvider.value(
-            value: _authBloc,
-            child: const StatisticsPage(),
+          pageBuilder: (context, state) => _noTransitionPage(
+            state,
+            BlocProvider.value(
+              value: _authBloc,
+              child: const StatisticsPage(),
+            ),
           ),
         ),
         GoRoute(
           path: '/profile/edit',
-          builder: (context, state) => BlocProvider.value(
-            value: _authBloc,
-            child: const EditProfilePage(),
+          pageBuilder: (context, state) => _noTransitionPage(
+            state,
+            BlocProvider.value(
+              value: _authBloc,
+              child: const EditProfilePage(),
+            ),
           ),
         ),
         GoRoute(
           path: '/profile/skin',
-          builder: (context, state) => const SkinSettingsPage(),
+          pageBuilder: (context, state) => _noTransitionPage(
+            state,
+            const SkinSettingsPage(),
+          ),
         ),
       ],
     );

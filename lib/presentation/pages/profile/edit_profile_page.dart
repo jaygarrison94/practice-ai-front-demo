@@ -23,11 +23,15 @@ class EditProfilePage extends StatefulWidget {
 class _EditProfilePageState extends State<EditProfilePage> {
   final _formKey = GlobalKey<FormState>();
   final _nicknameController = TextEditingController();
-  String _gender = '未设置';
+  int _gender = 0;
   DateTime? _birthday;
   String? _avatarPath;
 
-  final _genders = ['未设置', '男', '女'];
+  static const _genderLabels = {
+    0: '未设置',
+    1: '男',
+    2: '女',
+  };
 
   @override
   void dispose() {
@@ -102,11 +106,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   child: CircleAvatar(
                     radius: 48,
                     backgroundColor: AppColors.primary,
-                    backgroundImage: _avatarPath != null
-                        ? FileImage(File(_avatarPath!))
-                        : null,
+                    backgroundImage:
+                        _avatarPath != null ? FileImage(File(_avatarPath!)) : null,
                     child: _avatarPath == null
-                        ? const Icon(Icons.camera_alt, size: 32, color: Colors.white)
+                        ? const Icon(Icons.camera_alt,
+                            size: 32, color: Colors.white)
                         : null,
                   ),
                 ),
@@ -124,13 +128,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   validator: Validators.validateNickname,
                 ),
                 const SizedBox(height: AppDimensions.md),
-                DropdownButtonFormField<String>(
+                DropdownButtonFormField<int>(
                   initialValue: _gender,
                   decoration: const InputDecoration(labelText: AppStrings.gender),
-                  items: _genders
-                      .map((g) => DropdownMenuItem(value: g, child: Text(g)))
+                  items: _genderLabels.entries
+                      .map(
+                        (entry) => DropdownMenuItem<int>(
+                          value: entry.key,
+                          child: Text(entry.value),
+                        ),
+                      )
                       .toList(),
-                  onChanged: (v) => setState(() => _gender = v ?? '未设置'),
+                  onChanged: (value) => setState(() => _gender = value ?? 0),
                 ),
                 const SizedBox(height: AppDimensions.md),
                 ListTile(

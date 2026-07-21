@@ -5,7 +5,7 @@ class UserProfile extends Equatable {
   final String phone;
   final String? nickname;
   final String? avatar;
-  final String? gender;
+  final int? gender;
   final String? birthday;
   final bool remindSoundEnabled;
   final bool remindVibrationEnabled;
@@ -27,7 +27,7 @@ class UserProfile extends Equatable {
       phone: json['phone'] as String,
       nickname: json['nickname'] as String?,
       avatar: json['avatar'] as String?,
-      gender: json['gender'] as String?,
+      gender: _parseGender(json['gender']),
       birthday: json['birthday'] as String?,
       remindSoundEnabled: json['remindSoundEnabled'] as bool? ?? true,
       remindVibrationEnabled: json['remindVibrationEnabled'] as bool? ?? true,
@@ -52,7 +52,7 @@ class UserProfile extends Equatable {
     String? phone,
     String? nickname,
     String? avatar,
-    String? gender,
+    int? gender,
     String? birthday,
     bool? remindSoundEnabled,
     bool? remindVibrationEnabled,
@@ -81,4 +81,12 @@ class UserProfile extends Equatable {
         remindSoundEnabled,
         remindVibrationEnabled,
       ];
+}
+
+int? _parseGender(dynamic value) {
+  if (value == null) return null;
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  if (value is String) return int.tryParse(value);
+  return null;
 }

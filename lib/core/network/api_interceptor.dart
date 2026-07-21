@@ -23,8 +23,10 @@ class AuthInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    if (err.response?.statusCode == 401) {
-      _authStorage.clearAuth();
+    final statusCode = err.response?.statusCode;
+    if (statusCode == 401 || statusCode == 403) {
+      _authStorage.clearAuth().whenComplete(() => handler.next(err));
+      return;
     }
     handler.next(err);
   }

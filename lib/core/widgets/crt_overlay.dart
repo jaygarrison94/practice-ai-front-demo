@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:math';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 
 class CrtOverlay extends StatefulWidget {
   final Widget child;
@@ -11,23 +13,22 @@ class CrtOverlay extends StatefulWidget {
   State<CrtOverlay> createState() => _CrtOverlayState();
 }
 
-class _CrtOverlayState extends State<CrtOverlay>
-    with SingleTickerProviderStateMixin {
-  late final Ticker _ticker;
-  int _frame = 0;
+class _CrtOverlayState extends State<CrtOverlay> {
+  final ValueNotifier<int> _frame = ValueNotifier<int>(0);
+  late final Timer _timer;
 
   @override
   void initState() {
     super.initState();
-    _ticker = createTicker((elapsed) {
-      setState(() => _frame++);
+    _timer = Timer.periodic(const Duration(milliseconds: 500), (_) {
+      _frame.value++;
     });
-    _ticker.start();
   }
 
   @override
   void dispose() {
-    _ticker.dispose();
+    _timer.cancel();
+    _frame.dispose();
     super.dispose();
   }
 
@@ -37,9 +38,11 @@ class _CrtOverlayState extends State<CrtOverlay>
       children: [
         widget.child,
         IgnorePointer(
-          child: CustomPaint(
-            painter: _CrtEffectPainter(_frame),
-            child: const SizedBox.expand(),
+          child: RepaintBoundary(
+            child: CustomPaint(
+              painter: _CrtEffectPainter(frame: _frame),
+              child: const SizedBox.expand(),
+            ),
           ),
         ),
       ],
@@ -48,10 +51,10 @@ class _CrtOverlayState extends State<CrtOverlay>
 }
 
 class _CrtEffectPainter extends CustomPainter {
-  final int frame;
+  final ValueListenable<int> frame;
   final _random = Random(42);
 
-  _CrtEffectPainter(this.frame);
+  _CrtEffectPainter({required this.frame}) : super(repaint: frame);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -79,8 +82,8 @@ class _CrtEffectPainter extends CustomPainter {
       ).createShader(rect);
     canvas.drawRect(rect, gradientPaint);
 
-    // Random subtle flicker (every ~30 frames)
-    if (frame % 30 == 0 && _random.nextDouble() > 0.7) {
+    // Random subtle flicker.
+    if (frame.value % 4 == 0 && _random.nextDouble() > 0.7) {
       final flickerPaint = Paint()
         ..color = Colors.white.withAlpha(5);
       canvas.drawRect(rect, flickerPaint);
@@ -88,5 +91,5 @@ class _CrtEffectPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _CrtEffectPainter oldDelegate) => true;
+  bool shouldRepaint(covariant _CrtEffectPainter oldDelegate) => false;
 }

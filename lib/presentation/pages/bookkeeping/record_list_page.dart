@@ -140,7 +140,7 @@ class _RecordListPageState extends State<RecordListPage> {
                     title: Text(record.categoryName ?? record.typeName),
                     subtitle: Text(record.note ?? record.recordDate),
                     trailing: Text(
-                      '${record.isIncome ? '+' : '-'}${record.amountDisplay}',
+                      record.signedAmountDisplay,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,

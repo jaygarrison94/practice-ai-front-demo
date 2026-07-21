@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'auth_event.dart';
@@ -11,17 +13,22 @@ import '../../../data/models/user/user_register_request.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final UserRepository _userRepository;
   final AuthLocalDataSource _authStorage;
+  late final StreamSubscription<void> _authClearedSubscription;
 
-  AuthBloc(this._userRepository, this._authStorage)
-      : super(const AuthState()) {
+  AuthBloc(this._userRepository, this._authStorage) : super(const AuthState()) {
     on<SendSmsCode>(_onSendSmsCode);
     on<RegisterSubmitted>(_onRegister);
     on<LoginSubmitted>(_onLogin);
     on<LogoutRequested>(_onLogout);
+    on<AuthSessionExpired>(_onAuthSessionExpired);
     on<CheckAuthStatus>(_onCheckAuthStatus);
     on<UpdateProfile>(_onUpdateProfile);
     on<ResetPassword>(_onResetPassword);
     on<LoadProfile>(_onLoadProfile);
+
+    _authClearedSubscription = _authStorage.authCleared.listen((_) {
+      if (!isClosed) add(AuthSessionExpired());
+    });
   }
 
   Future<void> _onSendSmsCode(
@@ -47,7 +54,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         agreementAccepted: event.agreementAccepted,
       );
       final result = await _userRepository.register(request);
-      final user = User(id: result.userId, phone: event.phone, token: result.token);
+      final user =
+          User(id: result.userId, phone: event.phone, token: result.token);
       await _authStorage.saveToken(result.token);
       await _authStorage.saveUserId(result.userId);
       emit(state.copyWith(
@@ -63,8 +71,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<void> _onLogin(
-      LoginSubmitted event, Emitter<AuthState> emit) async {
+  Future<void> _onLogin(LoginSubmitted event, Emitter<AuthState> emit) async {
     emit(state.copyWith(status: AuthStatus.loading, error: null));
     try {
       final request = UserLoginRequest(
@@ -73,11 +80,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         rememberPassword: event.rememberPassword,
       );
       final result = await _userRepository.login(request);
-      final user = User(id: result.userId, phone: event.phone, token: result.token);
+      final user =
+          User(id: result.userId, phone: event.phone, token: result.token);
       await _authStorage.saveToken(result.token);
       await _authStorage.saveUserId(result.userId);
       if (event.rememberPassword) {
-        await _authStorage.saveRememberedCredentials(event.phone, event.password);
+        await _authStorage.saveRememberedCredentials(
+            event.phone, event.password);
       }
       emit(state.copyWith(
         status: AuthStatus.authenticated,
@@ -91,17 +100,26 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<void> _onLogout(
-      LogoutRequested event, Emitter<AuthState> emit) async {
+  Future<void> _onLogout(LogoutRequested event, Emitter<AuthState> emit) async {
     emit(state.copyWith(status: AuthStatus.loading));
     try {
       await _userRepository.logout();
     } catch (_) {}
-    await _authStorage.clearAuth();
+    await _authStorage.clearAuth(notify: false);
     emit(state.copyWith(
       status: AuthStatus.unauthenticated,
       user: null,
       profile: null,
+    ));
+  }
+
+  Future<void> _onAuthSessionExpired(
+      AuthSessionExpired event, Emitter<AuthState> emit) async {
+    emit(state.copyWith(
+      status: AuthStatus.unauthenticated,
+      user: null,
+      profile: null,
+      error: '登录已过期，请重新登录',
     ));
   }
 
@@ -143,7 +161,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   Future<void> _onResetPassword(
       ResetPassword event, Emitter<AuthState> emit) async {
-    emit(state.copyWith(status: AuthStatus.loading, error: null, successMessage: null));
+    emit(state.copyWith(
+        status: AuthStatus.loading, error: null, successMessage: null));
     try {
       await _userRepository.resetPassword(
         phone: event.phone,
@@ -171,6 +190,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } catch (e) {
       emit(state.copyWith(error: '加载用户信息失败'));
     }
+  }
+
+  @override
+  Future<void> close() async {
+    await _authClearedSubscription.cancel();
+    return super.close();
   }
 
   String _parseError(dynamic e) {

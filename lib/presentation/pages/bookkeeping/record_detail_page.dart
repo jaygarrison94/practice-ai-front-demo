@@ -72,7 +72,7 @@ class _RecordDetailPageState extends State<RecordDetailPage> {
                       child: Column(
                         children: [
                           Text(
-                            record.amountDisplay,
+                            record.absoluteAmountDisplay,
                             style: TextStyle(
                               fontSize: 36,
                               fontWeight: FontWeight.bold,

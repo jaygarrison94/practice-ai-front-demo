@@ -52,12 +52,14 @@ class LoginSubmitted extends AuthEvent {
 
 class LogoutRequested extends AuthEvent {}
 
+class AuthSessionExpired extends AuthEvent {}
+
 class CheckAuthStatus extends AuthEvent {}
 
 class UpdateProfile extends AuthEvent {
   final String? nickname;
   final String? avatar;
-  final String? gender;
+  final int? gender;
   final String? birthday;
 
   const UpdateProfile({this.nickname, this.avatar, this.gender, this.birthday});

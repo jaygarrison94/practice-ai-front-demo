@@ -68,7 +68,7 @@ class UserRepository {
   Future<void> updateProfile({
     String? nickname,
     String? avatar,
-    String? gender,
+    int? gender,
     String? birthday,
   }) async {
     final params = <String, dynamic>{};

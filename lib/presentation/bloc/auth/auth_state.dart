@@ -26,15 +26,16 @@ class AuthState extends Equatable implements MessageState {
 
   AuthState copyWith({
     AuthStatus? status,
-    User? user,
-    UserProfile? profile,
+    Object? user = _unset,
+    Object? profile = _unset,
     Object? error = _unset,
     Object? successMessage = _unset,
   }) {
     return AuthState(
       status: status ?? this.status,
-      user: user ?? this.user,
-      profile: profile ?? this.profile,
+      user: identical(user, _unset) ? this.user : user as User?,
+      profile:
+          identical(profile, _unset) ? this.profile : profile as UserProfile?,
       error: identical(error, _unset) ? this.error : error as String?,
       successMessage: identical(successMessage, _unset)
           ? this.successMessage

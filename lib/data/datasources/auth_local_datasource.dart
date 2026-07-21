@@ -1,9 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AuthLocalDataSource {
   final FlutterSecureStorage _storage;
+  final StreamController<void> _authClearedController =
+      StreamController<void>.broadcast();
 
   AuthLocalDataSource(this._storage);
+
+  Stream<void> get authCleared => _authClearedController.stream;
 
   static const _tokenKey = 'auth_token';
   static const _userIdKey = 'user_id';
@@ -34,10 +40,15 @@ class AuthLocalDataSource {
     return {'phone': phone, 'password': password};
   }
 
-  Future<void> clearAuth() async {
+  Future<void> clearAuth({bool notify = true}) async {
     await _storage.delete(key: _tokenKey);
     await _storage.delete(key: _userIdKey);
+    if (notify && !_authClearedController.isClosed) {
+      _authClearedController.add(null);
+    }
   }
 
   Future<void> clearAll() async => await _storage.deleteAll();
+
+  Future<void> dispose() => _authClearedController.close();
 }

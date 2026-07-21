@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import '../../../core/utils/formatters.dart';
+
 class Record extends Equatable {
   final int id;
   final int type;
@@ -52,6 +54,13 @@ class Record extends Equatable {
   }
 
   bool get isIncome => type == 2;
+
+  String get absoluteAmountDisplay => Formatters.formatAmount(amount.abs());
+
+  String get signedAmountDisplay {
+    final prefix = isIncome ? '+' : '-';
+    return '$prefix$absoluteAmountDisplay';
+  }
 
   @override
   List<Object?> get props => [
